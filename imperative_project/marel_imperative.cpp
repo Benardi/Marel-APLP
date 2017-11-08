@@ -1,10 +1,10 @@
 #include <iostream>
 using namespace std;
 
-int marel_board [3][3] = { {0,1,2}, {1, 0,2}, {1,2,0} };
+char marel_board [3][3] = { {'_','_','_'}, {'_','_','_'}, {'_','_','_'} };
 
 
-
+/*
 char map_cell(int content){
   if(content == 1){
     return 'X';
@@ -16,13 +16,27 @@ char map_cell(int content){
    return '_';
   }
 
+}*/
+
+bool place_piece(char piece, int row, int column){
+  if(row < 0 || row > 2 || column < 0 || column > 2 ){
+    return false;
+  }else if(marel_board[row][column] != '_'){
+    return false;
+  }
+  else{
+    marel_board[row][column] = piece;
+    return true;
+  }
+
 }
 
-void snapshot_board(int platform [3][3]){
+void snapshot_board(char platform [3][3]){
   endl(cout);
   for(int i = 0; i < 3; i++){
+    cout << ' ';
     for(int j = 0; j < 3; j++){
-      cout << map_cell(platform[i][j]) << ' ';
+      cout << platform[i][j] << ' ';
     }
     endl(cout);
   }
@@ -31,6 +45,10 @@ void snapshot_board(int platform [3][3]){
 
 int main()
 {
+  cout << place_piece('X', 1, -1) << endl;
+  cout << place_piece('O', 1, 1) << endl;
+  cout << place_piece('X', 1, 1) << endl;
   snapshot_board(marel_board);
 
+  return 0;
 }
