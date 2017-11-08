@@ -2,7 +2,7 @@
 using namespace std;
 
 char marel_board [3][3] = { {'_','_','_'}, {'_','_','_'}, {'_','_','_'} };
-
+char column_index [3] = {'A', 'B', 'C'};
 
 /*
 char map_cell(int content){
@@ -32,9 +32,17 @@ bool place_piece(char piece, int row, int column){
 }
 
 void snapshot_board(char platform [3][3]){
+
   endl(cout);
+  cout << ' ' << ' ';
   for(int i = 0; i < 3; i++){
-    cout << ' ';
+    cout << ' ' << column_index[i];
+  }
+
+  endl(cout);
+
+  for(int i = 0; i < 3; i++){
+    cout << ' ' << i+1 << ' ';
     for(int j = 0; j < 3; j++){
       cout << platform[i][j] << ' ';
     }
@@ -45,6 +53,8 @@ void snapshot_board(char platform [3][3]){
 
 int main()
 {
+
+  snapshot_board(marel_board);
   cout << place_piece('X', 1, -1) << endl;
   cout << place_piece('O', 1, 1) << endl;
   cout << place_piece('X', 1, 1) << endl;
