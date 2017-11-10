@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 char marel_board [3][3] = { {'_','_','_'}, {'_','_','_'}, {'_','_','_'} };
@@ -8,6 +9,52 @@ struct Coordinate {
   int row;
   int column;
 };
+
+struct Piece {
+  char shape;
+  Coordinate coordinate;
+};
+
+struct Player {
+  string name;
+  Piece pieces[3];
+};
+
+Player create_player(string name, char piece_shape) {
+  struct Player player;
+
+  struct Piece piece1, piece2, piece3;
+
+  struct Coordinate coordinate1, coordinate2, coordinate3;
+
+  coordinate1.row = -1;
+  coordinate1.column = -1;
+  coordinate2.row = -1;
+  coordinate2.column = -1;
+  coordinate3.row = -1;
+  coordinate3.column = -1;
+
+  piece1.shape = piece_shape;
+  piece1.coordinate = coordinate1;
+
+  piece2.shape = piece_shape;
+  piece2.coordinate = coordinate2;
+
+  piece3.shape = piece_shape;
+  piece3.coordinate = coordinate3;
+
+  player.name = name;
+  player.pieces[0] = piece1;
+  player.pieces[1] = piece2;
+  player.pieces[2] = piece3;
+
+  cout << player.name << endl;
+  cout<< player.pieces[0].shape << endl;
+  cout<< player.pieces[0].coordinate.row << endl;
+  cout<< player.pieces[0].coordinate.column << endl;
+
+  return player;
+}
 
 bool check_coordinate(struct Coordinate coordinate) {
   if (coordinate.row < 0 || coordinate.row > 2
@@ -62,7 +109,6 @@ void snapshot_board(char platform [3][3]) {
   endl(cout);
 }
 
-
 bool move_piece(struct Coordinate current_coord,
   struct Coordinate final_coord){
     if(check_move(current_coord, final_coord)){
@@ -75,8 +121,13 @@ bool move_piece(struct Coordinate current_coord,
 
 }
 
-int main()
-{
+int main() {
+  string player_name1;
+  char piece_shape1;
+  cin >> player_name1;
+  cin >> piece_shape1;
+
+  cout << piece_shape1;
 
   snapshot_board(marel_board);
 
@@ -106,9 +157,8 @@ int main()
 
   cout << check_move(current_coordinate, final_coordinate1) << endl; // accept
   cout << check_move(current_coordinate, final_coordinate2) << endl; // rejected
+  cout << move_piece(current_coordinate,final_coordinate1) << endl; // movimenta a peça para uma casa abaixo
 
-// movimenta a peça para uma casa abaixo
-  cout << move_piece(current_coordinate,final_coordinate1) << endl;
   snapshot_board(marel_board);
 
   return 0;
