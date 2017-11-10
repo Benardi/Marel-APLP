@@ -31,6 +31,28 @@ bool place_piece(char piece, int row, int column){
 
 }
 
+bool check_victory(char platform[3][3], char player) {
+  int positions_pieces[3][2] = {{-1, -1}, {-1, -1}, {-1, -1}};
+
+  for (int i = 0; i < 3; i++) {
+    int index_piece = 0;
+    int cord_x = 0;
+    int cord_y = 1;
+
+    for (int j = 0; j < 3; j++) {
+      char piece = platform[i][j];
+
+      if (piece == player) {
+        positions_pieces[index_piece][cord_x] = i;
+        positions_pieces[index_piece][cord_y] = j;
+        index_piece++;
+      }
+    }
+  }
+
+  return false;
+}
+
 void snapshot_board(char platform [3][3]){
 
   endl(cout);
