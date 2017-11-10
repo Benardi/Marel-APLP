@@ -57,7 +57,7 @@ Player create_player(string name, char piece_shape) {
 }
 
 bool check_coordinate(struct Coordinate coordinate) {
-  if (coordinate.row < 0 || coordinate.row > 2 
+  if (coordinate.row < 0 || coordinate.row > 2
     || coordinate.column < 0 || coordinate.column > 2) {
     return false;
   } else if (marel_board[coordinate.row][coordinate.column] != '_') {
@@ -73,9 +73,9 @@ void place_piece(char piece, struct Coordinate coordinate) {
   }
 }
 
-bool check_move(struct Coordinate current_coordinate, 
+bool check_move(struct Coordinate current_coordinate,
   struct Coordinate final_coordinate) {
-  if (current_coordinate.row < 0 || current_coordinate.row > 2 
+  if (current_coordinate.row < 0 || current_coordinate.row > 2
     || current_coordinate.column < 0 || current_coordinate.column > 2) {
     return false;
   } else if (marel_board[current_coordinate.row][current_coordinate.column] == '_') {
@@ -90,7 +90,7 @@ bool check_move(struct Coordinate current_coordinate,
 void snapshot_board(char platform [3][3]) {
   endl(cout);
   cout << ' ' << ' ';
-  
+
   for(int i = 0; i < 3; i++){
     cout << ' ' << column_index[i];
   }
@@ -107,6 +107,18 @@ void snapshot_board(char platform [3][3]) {
   }
 
   endl(cout);
+}
+
+bool move_piece(struct Coordinate current_coord,
+  struct Coordinate final_coord){
+    if(check_move(current_coord, final_coord)){
+      marel_board[final_coord.row][final_coord.column] = marel_board[current_coord.row][current_coord.column];
+      marel_board[current_coord.row][current_coord.column] = '_';
+      return true;
+  }else{
+      return false;
+  }
+
 }
 
 int main() {
@@ -134,6 +146,7 @@ int main() {
 
   snapshot_board(marel_board);
 
+
   struct Coordinate current_coordinate, final_coordinate1, final_coordinate2;
   current_coordinate.row = 1;
   current_coordinate.column = 1;
@@ -144,6 +157,9 @@ int main() {
 
   cout << check_move(current_coordinate, final_coordinate1) << endl; // accept
   cout << check_move(current_coordinate, final_coordinate2) << endl; // rejected
+  cout << move_piece(current_coordinate,final_coordinate1) << endl; // movimenta a peça para uma casa abaixo
+
+  snapshot_board(marel_board);
 
   return 0;
 }
