@@ -25,33 +25,28 @@ Player create_player(string name, char piece_shape) {
 
   struct Piece piece1, piece2, piece3;
 
-  struct Coordinate coordinate1, coordinate2, coordinate3;
+  struct Coordinate coord1, coord2, coord3;
 
-  coordinate1.row = -1;
-  coordinate1.column = -1;
-  coordinate2.row = -1;
-  coordinate2.column = -1;
-  coordinate3.row = -1;
-  coordinate3.column = -1;
+  coord1.row = -1;
+  coord1.column = -1;
+  coord2.row = -1;
+  coord2.column = -1;
+  coord3.row = -1;
+  coord3.column = -1;
 
   piece1.shape = piece_shape;
-  piece1.coordinate = coordinate1;
+  piece1.coordinate = coord1;
 
   piece2.shape = piece_shape;
-  piece2.coordinate = coordinate2;
+  piece2.coordinate = coord2;
 
   piece3.shape = piece_shape;
-  piece3.coordinate = coordinate3;
+  piece3.coordinate = coord3;
 
   player.name = name;
   player.pieces[0] = piece1;
   player.pieces[1] = piece2;
   player.pieces[2] = piece3;
-
-  cout << player.name << endl;
-  cout<< player.pieces[0].shape << endl;
-  cout<< player.pieces[0].coordinate.row << endl;
-  cout<< player.pieces[0].coordinate.column << endl;
 
   return player;
 }
@@ -73,14 +68,18 @@ void place_piece(char piece, struct Coordinate coordinate) {
   }
 }
 
-bool check_move(struct Coordinate current_coordinate,
-  struct Coordinate final_coordinate) {
-  if (current_coordinate.row < 0 || current_coordinate.row > 2
-    || current_coordinate.column < 0 || current_coordinate.column > 2) {
+bool check_move(char current_player_piece_shape, struct Coordinate current_coord,
+  struct Coordinate final_coord) {
+  char piece_shape = marel_board[current_coord.row][current_coord.column];
+
+  if (current_coord.row < 0 || current_coord.row > 2
+    || current_coord.column < 0 || current_coord.column > 2) {
     return false;
-  } else if (marel_board[current_coordinate.row][current_coordinate.column] == '_') {
+  } else if (piece_shape == '_') {
     return false;
-  } else if (! check_coordinate(final_coordinate)) {
+  } else if (current_player_piece_shape != piece_shape) {
+    return false;
+  } else if (! check_coordinate(final_coord)) {
     return false;
   }
 
@@ -109,56 +108,71 @@ void snapshot_board(char platform [3][3]) {
   endl(cout);
 }
 
-bool move_piece(struct Coordinate current_coord,
-  struct Coordinate final_coord){
-    if(check_move(current_coord, final_coord)){
+bool move_piece(char current_player_piece_shape, struct Coordinate current_coord,
+  struct Coordinate final_coord) {
+    if (check_move(current_player_piece_shape, current_coord, final_coord)) {
       marel_board[final_coord.row][final_coord.column] = marel_board[current_coord.row][current_coord.column];
       marel_board[current_coord.row][current_coord.column] = '_';
       return true;
-  }else{
+  } else {
       return false;
   }
+}
 
+Player get_human_player() {
+  string name;
+  char piece_shape;
+  cin >> name;
+  cin >> piece_shape;
+
+  return create_player(name, piece_shape);
+}
+
+Player get_computer_player(char human_piece_shape) {
+  string name = "Computer";
+  char piece_shape = 'X';
+
+  if (human_piece_shape == 'X') {
+    piece_shape = 'O';
+  }
+
+  return create_player(name, piece_shape);
 }
 
 int main() {
-  string player_name1;
-  char piece_shape1;
-  cin >> player_name1;
-  cin >> piece_shape1;
-
-  cout << piece_shape1;
+  
+  Player human_player = get_human_player();
+  Player computer_player = get_computer_player(human_player.pieces[0].shape);  
 
   snapshot_board(marel_board);
 
-  struct Coordinate coordinate1, coordinate2, coordinate3;
-  coordinate1.row = 1;
-  coordinate1.column = -1;
-  coordinate2.row = 1;
-  coordinate2.column = 1;
-  coordinate3.row = 2;
-  coordinate3.column = 2;
+  struct Coordinate coord1, coord2, coord3;
+  coord1.row = 1;
+  coord1.column = -1;
+  coord2.row = 1;
+  coord2.column = 1;
+  coord3.row = 2;
+  coord3.column = 2;
 
-  place_piece('X', coordinate1); // rejected
-  place_piece('O', coordinate2); // accepted
-  place_piece('X', coordinate3); // accepted
-  place_piece('O', coordinate3); // rejected
+  place_piece('X', coord1); // rejected
+  place_piece('O', coord2); // accepted
+  place_piece('X', coord3); // accepted
+  place_piece('O', coord3); // rejected
 
   snapshot_board(marel_board);
 
+  struct Coordinate current_coord, final_coord1, final_coord2;
+  current_coord.row = 1;
+  current_coord.column = 1;
+  final_coord1.row = 2;
+  final_coord1.column = 1;
+  final_coord2.row = 2;
+  final_coord2.column = 2;
 
-  struct Coordinate current_coordinate, final_coordinate1, final_coordinate2;
-  current_coordinate.row = 1;
-  current_coordinate.column = 1;
-  final_coordinate1.row = 2;
-  final_coordinate1.column = 1;
-  final_coordinate2.row = 2;
-  final_coordinate2.column = 2;
+  // moves the piece to a position below if the piece shape of the human player is O
+  char current_player_piece_shape = human_player.pieces[0].shape;
 
-  cout << check_move(current_coordinate, final_coordinate1) << endl; // accept
-  cout << check_move(current_coordinate, final_coordinate2) << endl; // rejected
-  cout << move_piece(current_coordinate,final_coordinate1) << endl; // movimenta a peça para uma casa abaixo
-
+  move_piece(current_player_piece_shape, current_coord, final_coord1);
   snapshot_board(marel_board);
 
   return 0;
