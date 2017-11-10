@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 char marel_board [3][3] = { {'_','_','_'}, {'_','_','_'}, {'_','_','_'} };
@@ -8,6 +9,52 @@ struct Coordinate {
   int row;
   int column;
 };
+
+struct Piece {
+  char shape;
+  Coordinate coordinate;
+};
+
+struct Player {
+  string name;
+  Piece pieces[3];
+};
+
+Player create_player(string name, char piece_shape) {
+  struct Player player;
+
+  struct Piece piece1, piece2, piece3;
+
+  struct Coordinate coordinate1, coordinate2, coordinate3;
+
+  coordinate1.row = -1;
+  coordinate1.column = -1;
+  coordinate2.row = -1;
+  coordinate2.column = -1;
+  coordinate3.row = -1;
+  coordinate3.column = -1;
+
+  piece1.shape = piece_shape;
+  piece1.coordinate = coordinate1;
+
+  piece2.shape = piece_shape;
+  piece2.coordinate = coordinate2;
+
+  piece3.shape = piece_shape;
+  piece3.coordinate = coordinate3;
+
+  player.name = name;
+  player.pieces[0] = piece1;
+  player.pieces[1] = piece2;
+  player.pieces[2] = piece3;
+
+  cout << player.name << endl;
+  cout<< player.pieces[0].shape << endl;
+  cout<< player.pieces[0].coordinate.row << endl;
+  cout<< player.pieces[0].coordinate.column << endl;
+
+  return player;
+}
 
 bool check_coordinate(struct Coordinate coordinate) {
   if (coordinate.row < 0 || coordinate.row > 2 
@@ -63,6 +110,13 @@ void snapshot_board(char platform [3][3]) {
 }
 
 int main() {
+  string player_name1;
+  char piece_shape1;
+  cin >> player_name1;
+  cin >> piece_shape1;
+
+  cout << piece_shape1;
+
   snapshot_board(marel_board);
 
   struct Coordinate coordinate1, coordinate2, coordinate3;
