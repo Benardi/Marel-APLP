@@ -119,6 +119,17 @@ bool move_piece(char current_player_piece_shape, struct Coordinate current_coord
   }
 }
 
+Coordinate cell_to_coord(string cell){
+  int column = toupper(cell.at(0)) - 65;
+  int row = cell.at(1) - 49;
+
+  struct Coordinate mapped;
+  mapped.column = column;
+  mapped.row = row;
+
+  return mapped;
+}
+
 Player get_human_player() {
   string name;
   char piece_shape;
@@ -140,9 +151,9 @@ Player get_computer_player(char human_piece_shape) {
 }
 
 int main() {
-  
+
   Player human_player = get_human_player();
-  Player computer_player = get_computer_player(human_player.pieces[0].shape);  
+  Player computer_player = get_computer_player(human_player.pieces[0].shape);
 
   snapshot_board(marel_board);
 
