@@ -51,6 +51,20 @@ void snapshot_board(char platform [3][3]){
   endl(cout);
 }
 
+bool move_piece(int current_row, int current_column, int new_row, int new_column){
+	// TODO chamar o metodo de lucas para validar o movimento
+  if(current_row < 0 || current_row > 2 || current_column < 0 || current_column > 2 || new_row < 0 || new_row > 2 || new_column < 0 || new_column > 2){
+    return false;
+  }else if(marel_board[current_row][current_column] == '_'){
+    return false;
+  }else{
+    marel_board[new_row][new_column] = marel_board[current_row][current_column];
+    marel_board[current_row][current_column] = '_';
+    return true;
+  }
+
+}
+
 int main()
 {
 
@@ -59,6 +73,11 @@ int main()
   cout << place_piece('O', 1, 1) << endl;
   cout << place_piece('X', 1, 1) << endl;
   snapshot_board(marel_board);
+
+// movimenta a peça para uma casa acima
+  cout << move_piece(1,1,0,1) << endl;
+  snapshot_board(marel_board);
+
 
   return 0;
 }
