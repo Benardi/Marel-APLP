@@ -51,15 +51,39 @@ Player create_player(string name, char piece_shape) {
   return player;
 }
 
-Coordinate cell_to_coord(string cell){
-  int column = toupper(cell.at(0)) - 65;
-  int row = cell.at(1) - 49;
+bool is_valid_cell(string cell){
+  if(cell.size() != 2){
+    return false;
+  }else{
+    char column = toupper(cell.at(0));
+    char row = cell.at(1);
+    if(column != 'A' && column != 'B' && column != 'C'){
+      return false;
+    }else if(row != '1' && row != '2' && row != '3'){
+      return false;
+    }else{
+      return true;
+    }
+  }
+}
 
+Coordinate cell_to_coord(string cell){
   struct Coordinate mapped;
-  mapped.column = column;
-  mapped.row = row;
+
+  if(is_valid_cell(cell)){
+    int column = toupper(cell.at(0)) - 65;
+    int row = cell.at(1) - 49;
+
+    mapped.column = column;
+    mapped.row = row;
+
+  }else{
+    mapped.column =  -1 ;
+    mapped.row =  -1 ;
+  }
 
   return mapped;
+
 }
 
 bool check_coordinate(string cell) {
@@ -175,6 +199,14 @@ int main() {
 
   move_piece(current_player_piece_shape, "B2", "B3");
   snapshot_board(marel_board);
+
+
+  cout << is_valid_cell("B4") << endl;             // expect 0
+  cout << is_valid_cell("C1") << endl;             // expect 1
+  cout << cell_to_coord("A3").row << endl;         // expect 2
+  cout << cell_to_coord("A3").column << endl;      // expect 0
+  cout << cell_to_coord("금요일밤").row << endl;    // expect -1
+  cout << cell_to_coord("금요일밤").column << endl; // expect -1
 
   return 0;
 }
