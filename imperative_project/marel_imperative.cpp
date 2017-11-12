@@ -287,9 +287,6 @@ void place_pieces(bool has_computer_player) {
 		
 		player_one.pieces[count].coordinate = cell_to_coord(coordinate_player_one);
 		place_piece(player_one.pieces[count].shape, coordinate_player_one);
-    cout << "Vitoria ou nao" << endl;
-    cout << check_victory(player_one.pieces) << endl;
-    cout << "fim" << endl;
 		
 		if(count == 2) {
 			is_victory =  false; // Put the function that verifies the victory in place of the false
