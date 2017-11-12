@@ -88,16 +88,74 @@ Coordinate cell_to_coord(string cell){
 
 }
 
+bool is_valid_coordante(struct Coordinate coordinate) {
+  return !(coordinate.row < 0) && !(coordinate.row > 2)
+    && !(coordinate.column < 0) && !(coordinate.column > 2);
+}
+
 bool check_coordinate(string cell) {
   Coordinate coordinate = cell_to_coord(cell);
-  if (coordinate.row < 0 || coordinate.row > 2
-    || coordinate.column < 0 || coordinate.column > 2) {
-    return false;
-  } else if (marel_board[coordinate.row][coordinate.column] != '_') {
-    return false;
+
+  bool is_valid_coordinate = is_valid_coordante(coordinate);
+  bool is_empty_position =  marel_board[coordinate.row][coordinate.column] == '_';
+  return is_valid_coordante && is_empty_position;
+}
+
+bool check_sequence(struct Piece pieces[3], bool check_column) {
+  int sequence = 0;
+
+  for (int i = 0; i < 3; i ++) {
+    for (int j = 0; j < 3; j++) {
+      struct Coordinate coordinate = pieces[j].coordinate;
+
+      if (check_column && coordinate.column == sequence) {
+        sequence++;
+      } else if (!check_column && coordinate.row == sequence) {
+        sequence++;
+      }
+    }
   }
 
-  return true;
+  bool is_sequence = sequence == 3;
+  return is_sequence;
+}
+
+bool check_equals_coordinate(struct Piece pieces[3], bool check_column) {
+  struct Coordinate piece_coordinate = pieces[0].coordinate;
+
+  for (int i = 0; i < 3; i++) {
+    struct Coordinate coordinate = pieces[i].coordinate;
+
+    if (check_column && coordinate.column != piece_coordinate.column) {
+      return false;
+    } else if (!check_column && coordinate.row != piece_coordinate.row) {
+      return false;
+    }
+  }
+
+  return true; 
+}
+
+bool check_victory(struct Piece pieces[3]) {
+  for (int i = 0; i < 3; i++) {
+    struct Coordinate coordinate = pieces[i].coordinate;
+
+    if (!is_valid_coordante(coordinate)) {
+      return false;
+    }
+  }
+
+  bool is_sequence_column = check_sequence(pieces, true);
+  bool is_sequence_row = check_sequence(pieces, false);
+  bool is_equals_coordinate_column = check_equals_coordinate(pieces, true);
+  bool is_equals_coordinate_row = check_equals_coordinate(pieces, false);
+
+  bool victory_column = is_sequence_column && is_equals_coordinate_row;
+  bool victory_row = is_sequence_row && is_equals_coordinate_column;
+  bool victory_diagonal = is_sequence_row && is_sequence_column;
+
+  bool victory = victory_column || victory_row || victory_diagonal;
+  return victory;
 }
 
 void place_piece(char piece, string cell) {
@@ -105,28 +163,6 @@ void place_piece(char piece, string cell) {
   if (check_coordinate(cell)) {
     marel_board[coordinate.row][coordinate.column] = piece;
   }
-}
-
-bool check_victory(char platform[3][3], char player) {
-  int positions_pieces[3][2] = {{-1, -1}, {-1, -1}, {-1, -1}};
-
-  for (int i = 0; i < 3; i++) {
-    int index_piece = 0;
-    int cord_x = 0;
-    int cord_y = 1;
-
-    for (int j = 0; j < 3; j++) {
-      char piece = platform[i][j];
-
-      if (piece == player) {
-        positions_pieces[index_piece][cord_x] = i;
-        positions_pieces[index_piece][cord_y] = j;
-        index_piece++;
-      }
-    }
-  }
-
-  return false;
 }
 
 bool check_move(char current_player_piece_shape, string current_cell, string final_cell) {
@@ -251,6 +287,9 @@ void place_pieces(bool has_computer_player) {
 		
 		player_one.pieces[count].coordinate = cell_to_coord(coordinate_player_one);
 		place_piece(player_one.pieces[count].shape, coordinate_player_one);
+    cout << "Vitoria ou nao" << endl;
+    cout << check_victory(player_one.pieces) << endl;
+    cout << "fim" << endl;
 		
 		if(count == 2) {
 			is_victory =  false; // Put the function that verifies the victory in place of the false
