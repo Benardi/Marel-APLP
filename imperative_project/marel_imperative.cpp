@@ -104,20 +104,21 @@ bool check_coordinate(string cell) {
 bool check_sequence(struct Piece pieces[3], bool check_column) {
   int sequence = 0;
 
-  for (int i = 0; i < 3; i ++) {
-    for (int j = 0; j < 3; j++) {
+  for (int i = 0; i < 2; i ++) {
+    struct Coordinate coordinate_compare = pieces[i].coordinate;
+
+    for (int j = i + 1; j < 3; j++) {
       struct Coordinate coordinate = pieces[j].coordinate;
 
-      if (check_column && coordinate.column == sequence) {
-        sequence++;
-      } else if (!check_column && coordinate.row == sequence) {
-        sequence++;
+      if (check_column && coordinate.column == coordinate_compare.column) {
+        return false;
+      } else if (!check_column && coordinate.row == coordinate_compare.row) {
+        return false;
       }
     }
   }
 
-  bool is_sequence = sequence == 3;
-  return is_sequence;
+  return true;
 }
 
 bool check_equals_coordinate(struct Piece pieces[3], bool check_column) {
