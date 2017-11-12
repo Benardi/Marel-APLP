@@ -1,3 +1,6 @@
 # ignorando arquivos executaveis
 marel_imperative
 marel_imperative.o
+
+# Arquivos de orig
+*.orig
