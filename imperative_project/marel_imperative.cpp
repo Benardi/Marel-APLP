@@ -102,8 +102,6 @@ bool check_coordinate(string cell) {
 }
 
 bool check_sequence(struct Piece pieces[3], bool check_column) {
-  int sequence = 0;
-
   for (int i = 0; i < 2; i ++) {
     struct Coordinate coordinate_compare = pieces[i].coordinate;
 
