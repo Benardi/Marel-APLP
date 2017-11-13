@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+
 using namespace std;
 
 const int number_pieces_player = 3;
@@ -85,7 +87,6 @@ Coordinate cell_to_coord(string cell){
   }
 
   return mapped;
-
 }
 
 bool is_valid_coordante(struct Coordinate coordinate) {
@@ -221,11 +222,11 @@ bool move_piece(char current_player_piece_shape, string current_cell, string fin
 Player get_human_player() {
   string name;
   char piece_shape;
-  cout << "Choose the name of your player:" << endl;
+  cout << "Choose the name of your player: ";
   cin >> name;
-  cout << "Choose the shape of your piece:" << endl;
+  cout << "Choose the shape of your piece: ";
   cin >> piece_shape;
-  cout << " -- Welcome to the game " + name << " -- " << endl << endl;		
+  cout << endl <<" -- Welcome to the game " + name << " -- " << endl << endl;		
   
   return create_player(name, piece_shape);
 }
@@ -248,7 +249,25 @@ void move_pieces(bool has_computer_player, bool is_victory) {
 		is_victory = true; //remove later
 	}	
 	
-	cout << "end game" << endl;
+	cout << "End Game!" << endl;
+}
+
+// get coordinate for the computer to place your piece
+Coordinate get_coordinate_to_place_piece() {
+  int random_row = rand() % 3;
+  int random_column = rand() % 3;
+
+  Coordinate coordinate;
+
+  while (marel_board[random_row][random_column] != '_') {
+    random_row = rand() % 3;
+    random_column = rand() % 3;
+  }
+
+  coordinate.row = random_row;
+  coordinate.column = random_column;
+
+  return coordinate;
 }
 
 void place_pieces(bool has_computer_player) {
@@ -273,7 +292,7 @@ void place_pieces(bool has_computer_player) {
 		bool is_not_played_valid_one = true;
 				
 		while(is_not_played_valid_one) {
-			cout << "Player " + player_one.name << " Choose where you place your piece (according to the coordinates above on the map):" << endl;
+			cout << "Player " + player_one.name << " choose where you place your piece (according to the coordinates above on the map): ";
 		
 			cin >> coordinate_player_one;
 			
@@ -292,12 +311,13 @@ void place_pieces(bool has_computer_player) {
 		}
 		
 		if (!is_victory) {
+      snapshot_board(marel_board);
+
 			if (!has_computer_player) {
-				snapshot_board(marel_board);
 				bool is_not_played_valid_two = true;	
 				
 				while(is_not_played_valid_two) {
-					cout << "Player " + player_two.name << " Choose where you place your piece (according to the coordinates above on the map):" << endl;
+					cout << "Player " + player_two.name << " choose where you place your piece (according to the coordinates above on the map): ";
 					
 					cin >> coordinate_player_two;
 				
@@ -307,12 +327,17 @@ void place_pieces(bool has_computer_player) {
 						cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
 					}
 				}
-					
-				player_two.pieces[count].coordinate = cell_to_coord(coordinate_player_two);
-				place_piece(player_two.pieces[count].shape, coordinate_player_two);
-					
+
+        player_two.pieces[count].coordinate = cell_to_coord(coordinate_player_two);
+        place_piece(player_two.pieces[count].shape, coordinate_player_two);					
 			} else {
-				// to do computer player
+        cout << player_two.name + " place your piece on the board:" << endl;
+
+        Coordinate computer_coordinate = get_coordinate_to_place_piece();
+
+        player_two.pieces[count].coordinate.row = computer_coordinate.row;
+        player_two.pieces[count].coordinate.column = computer_coordinate.column;
+        marel_board[computer_coordinate.row][computer_coordinate.column] = player_two.pieces[count].shape;
 			}
 		}
 		
@@ -328,19 +353,22 @@ void menu_principal() {
 	cout << "#          Play and have lots of fun          #" << endl;
 	cout << "###############################################" << endl << endl;
 	
-	cout << "Choose an option:"<< endl;
-	cout << "Option 1: play with a friend" << endl;
-	cout << "Option 2: play with the computer" << endl;
-	cout << "Option anything: quit the game" << endl;
+	cout << "Choose an option:" << endl;
+	cout << "Option (1): play with a friend." << endl;
+	cout << "Option (2): play with the computer." << endl;
+	cout << "Option (anything): quit the game." << endl << endl;
 	int opcao;
+
+  cout << "Option: ";
 	cin >>  opcao;
+  cout << endl;
 	
 	if (opcao == 1) {
 		place_pieces(false);		
 	} else if (opcao == 2) {
 		place_pieces(true);
 	} else {
-		cout << "Bye see you later" << endl;
+		cout << "Bye! See you later." << endl;
 	}
 }
 
