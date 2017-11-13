@@ -133,7 +133,7 @@ bool check_equals_coordinate(struct Piece pieces[3], bool check_column) {
     }
   }
 
-  return true; 
+  return true;
 }
 
 bool check_victory(struct Piece pieces[3]) {
@@ -226,8 +226,8 @@ Player get_human_player() {
   cin >> name;
   cout << "Choose the shape of your piece: ";
   cin >> piece_shape;
-  cout << endl <<" -- Welcome to the game " + name << " -- " << endl << endl;		
-  
+  cout << endl <<" -- Welcome to the game " + name << " -- " << endl << endl;
+
   return create_player(name, piece_shape);
 }
 
@@ -247,9 +247,10 @@ void move_pieces(bool has_computer_player, bool is_victory) {
 		snapshot_board(marel_board);
 		// to do
 		is_victory = true; //remove later
-	}	
-	
-	cout << "End Game!" << endl;
+	}
+
+    snapshot_board(marel_board);
+	cout << " End Game!" << endl;
 }
 
 // get coordinate for the computer to place your piece
@@ -274,76 +275,76 @@ void place_pieces(bool has_computer_player) {
 	cout << " -- PLAYER ONE -- " << endl;
 	Player player_one = get_human_player();
 	Player player_two;
-	
+
 	if (!has_computer_player) {
 		cout << " -- PLAYER TWO -- " << endl;
 		player_two = get_human_player();
 	} else {
 		player_two = get_computer_player(player_one.pieces[0].shape);
 	}
-	
+
 	bool is_victory = false;
 	int count = 0;
-	
+
 	while (count < number_pieces_player) {
 		snapshot_board(marel_board);
 		string coordinate_player_one;
 		string coordinate_player_two;
 		bool is_not_played_valid_one = true;
-				
+
 		while(is_not_played_valid_one) {
 			cout << "Player " + player_one.name << " choose where you place your piece (according to the coordinates above on the map): ";
-		
+
 			cin >> coordinate_player_one;
-			
+
 			is_not_played_valid_one = !check_coordinate(coordinate_player_one);
-			
+
 			if(is_not_played_valid_one) {
 				cout << "Invalid player movement, please try again " + player_one.name << endl << endl;
 			}
 		}
-		
+
 		player_one.pieces[count].coordinate = cell_to_coord(coordinate_player_one);
 		place_piece(player_one.pieces[count].shape, coordinate_player_one);
-		
-		if(count == 2) {
-			is_victory =  false; // Put the function that verifies the victory in place of the false
-		}
-		
+
+        is_victory = check_victory(player_one.pieces) || check_victory(player_two.pieces);
+
+
 		if (!is_victory) {
-      snapshot_board(marel_board);
+            snapshot_board(marel_board);
 
 			if (!has_computer_player) {
-				bool is_not_played_valid_two = true;	
-				
+				bool is_not_played_valid_two = true;
+
 				while(is_not_played_valid_two) {
 					cout << "Player " + player_two.name << " choose where you place your piece (according to the coordinates above on the map): ";
-					
+
 					cin >> coordinate_player_two;
-				
+
 					is_not_played_valid_two = !check_coordinate(coordinate_player_two);
-				
+
 					if(is_not_played_valid_two) {
 						cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
 					}
 				}
 
         player_two.pieces[count].coordinate = cell_to_coord(coordinate_player_two);
-        place_piece(player_two.pieces[count].shape, coordinate_player_two);					
+        place_piece(player_two.pieces[count].shape, coordinate_player_two);
 			} else {
-        cout << player_two.name + " place your piece on the board:" << endl;
 
-        Coordinate computer_coordinate = get_coordinate_to_place_piece();
+                cout << player_two.name + " place your piece on the board:" << endl;
 
-        player_two.pieces[count].coordinate.row = computer_coordinate.row;
-        player_two.pieces[count].coordinate.column = computer_coordinate.column;
-        marel_board[computer_coordinate.row][computer_coordinate.column] = player_two.pieces[count].shape;
+                Coordinate computer_coordinate = get_coordinate_to_place_piece();
+
+                player_two.pieces[count].coordinate.row = computer_coordinate.row;
+                player_two.pieces[count].coordinate.column = computer_coordinate.column;
+                marel_board[computer_coordinate.row][computer_coordinate.column] = player_two.pieces[count].shape;
 			}
 		}
-		
+
 		count++;
 	}
-	
+
 	move_pieces(has_computer_player, is_victory);
 }
 
@@ -352,7 +353,7 @@ void menu_principal() {
 	cout << "#          MAREL THE BEST GAME EVER           #" << endl;
 	cout << "#          Play and have lots of fun          #" << endl;
 	cout << "###############################################" << endl << endl;
-	
+
 	cout << "Choose an option:" << endl;
 	cout << "Option (1): play with a friend." << endl;
 	cout << "Option (2): play with the computer." << endl;
@@ -362,9 +363,9 @@ void menu_principal() {
   cout << "Option: ";
 	cin >>  opcao;
   cout << endl;
-	
+
 	if (opcao == 1) {
-		place_pieces(false);		
+		place_pieces(false);
 	} else if (opcao == 2) {
 		place_pieces(true);
 	} else {
@@ -378,7 +379,7 @@ int main() {
 //  Player computer_player = get_computer_player(human_player.pieces[0].shape);
 
 //  snapshot_board(marel_board);
-  
+
   menu_principal();
 
 //  place_piece('X', "A8"); // rejected
