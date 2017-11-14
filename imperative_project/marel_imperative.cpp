@@ -273,6 +273,37 @@ int get_position_piece(Player player, string current_cell) {
 	return -1;
 }
 
+void search_piece_computer(char computer_shape){
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      if(marel_board[i][j] == computer_shape){
+        marel_board[i][j] = '_';
+        return;
+      }
+    }
+  }
+
+}
+
+void computer_move_pieces(char computer_shape) {
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      if(marel_board[i][j] == '_'){
+        search_piece_computer(computer_shape);
+        marel_board[i][j] = computer_shape;
+        return;
+      }
+    }
+    
+  }
+
+  snapshot_board(marel_board);
+
+}
+
+
 void move_pieces(bool has_computer_player, bool is_victory, Player player_one, Player player_two) {
 	while(!is_victory) {
 		snapshot_board(marel_board);
@@ -334,7 +365,8 @@ void move_pieces(bool has_computer_player, bool is_victory, Player player_one, P
 				player_two.pieces[position_piece_in_player_two].coordinate = cell_to_coord(final_coordinate_player_two);
 				
 			} else {
-				// To do computer player
+
+        computer_move_pieces(player_two.pieces[0].shape);
 			}
 			
 			is_victory = check_victory(player_two.pieces);
@@ -347,6 +379,8 @@ void move_pieces(bool has_computer_player, bool is_victory, Player player_one, P
     cout << "Congratulations, player " + player_win.name << ", you won." << endl;
 	cout << " End Game!" << endl;
 }
+
+
 
 void place_pieces(bool has_computer_player) {
 	cout << " -- PLAYER ONE -- " << endl;
