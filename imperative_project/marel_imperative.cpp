@@ -136,6 +136,23 @@ bool check_equals_coordinate(struct Piece pieces[3], bool check_column) {
   return true;
 }
 
+bool check_diagonals(struct Piece pieces[3]) {
+  for (int i = 0; i < 3; i++) {
+    struct Coordinate coordinate = pieces[i].coordinate;
+    bool main_diagonal = coordinate.row == coordinate.column;
+
+    bool secondary_diagonal = coordinate.row == 2 && coordinate.column == 0 
+                            || coordinate.row == 0 && coordinate.column == 2
+                            || coordinate.row == 1 && coordinate.column == 1;
+    
+    if (!main_diagonal && !secondary_diagonal) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool check_victory(struct Piece pieces[3]) {
   for (int i = 0; i < 3; i++) {
     struct Coordinate coordinate = pieces[i].coordinate;
@@ -152,7 +169,7 @@ bool check_victory(struct Piece pieces[3]) {
 
   bool victory_column = is_sequence_column && is_equals_coordinate_row;
   bool victory_row = is_sequence_row && is_equals_coordinate_column;
-  bool victory_diagonal = is_sequence_row && is_sequence_column;
+  bool victory_diagonal = is_sequence_row && is_sequence_column && check_diagonals(pieces);
 
   bool victory = victory_column || victory_row || victory_diagonal;
   return victory;
