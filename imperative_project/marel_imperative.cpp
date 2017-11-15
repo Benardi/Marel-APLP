@@ -310,20 +310,94 @@ void search_piece_computer(char computer_shape){
   }
 }
 
+
+bool is_free(int x, int y){
+
+  if(marel_board[x][y] == '_'){
+    return true;
+  }
+
+  return false;
+  
+}
+
+bool swap_piece(int x, int y, int new_x, int new_y, int shape){
+
+
+  marel_board[x][y] = '_';   
+  marel_board[new_x][new_y] = shape;    
+
+
+}
+
+
+bool is_position_valid(int x, int y) {
+
+  if(x > -1 && x < 3 && y < 3 && y > -1){
+    return true;
+  }else{
+    return false;
+  }
+
+  
+}
+
+
 void computer_move_pieces(char computer_shape) {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      if(marel_board[i][j] == '_'){
-        search_piece_computer(computer_shape);
-        marel_board[i][j] = computer_shape;
-        return;
+
+      if(marel_board[i][j] == computer_shape){
+
+        if(i != 1 && j != 1 && is_free(1, 1)){
+          swap_piece(i, j, 1, 1, computer_shape);
+          return;
+        }
+
+        if(is_position_valid(i+1, j)){
+
+          if(is_free(i+1, j)){
+            swap_piece(i, j, i+1, j, computer_shape);
+            return;
+          }
+
+        }
+
+        if(is_position_valid(i-1, j)){
+
+          if(is_free(i-1, j)){
+            swap_piece(i, j, i-1, j, computer_shape);
+            return;
+          }
+
+        }
+
+        if(is_position_valid(i, j-1)){
+
+          if(is_free(i, j-1)){
+            swap_piece(i, j, i, j-1, computer_shape);
+            return;
+          }
+
+        }
+
+        if(is_position_valid(i, j+1)){
+
+          if(is_free(i, j+1)){
+            swap_piece(i, j, i, j+1, computer_shape);
+            return;
+          }
+
+        }
+                
       }
     }
   }
 
   snapshot_board(marel_board);
 }
+
 
 void move_pieces(bool has_computer_player, bool is_victory, Player player_one, Player player_two) {
 	while(!is_victory) {
