@@ -110,6 +110,15 @@ bool check_coordinate(string cell) {
   return is_valid_coordante && is_empty_position;
 }
 
+bool check_coord_to_be_moved(string cell, Player player) {
+  Coordinate coordinate = cell_to_coord(cell);
+
+  bool is_valid_coordinate = is_valid_coordante(coordinate);
+  bool is_empty_position =  marel_board[coordinate.row][coordinate.column] == '_';
+  bool is_player_piece = marel_board[coordinate.row][coordinate.column] == player.pieces[0].shape;
+  return is_valid_coordante && !is_empty_position && is_player_piece;
+}
+
 bool check_sequence(struct Piece pieces[3], bool check_column) {
   for (int i = 0; i < 2; i ++) {
     struct Coordinate coordinate_compare = pieces[i].coordinate;
@@ -149,10 +158,10 @@ bool check_diagonals(struct Piece pieces[3]) {
     struct Coordinate coordinate = pieces[i].coordinate;
     bool main_diagonal = coordinate.row == coordinate.column;
 
-    bool secondary_diagonal = coordinate.row == 2 && coordinate.column == 0 
+    bool secondary_diagonal = coordinate.row == 2 && coordinate.column == 0
                             || coordinate.row == 0 && coordinate.column == 2
                             || coordinate.row == 1 && coordinate.column == 1;
-    
+
     if (!main_diagonal && !secondary_diagonal) {
       return false;
     }
@@ -288,13 +297,13 @@ Coordinate get_coordinate_to_place_piece() {
 // get the position of the piece to be moved by a player
 int get_position_piece(Player player, string current_cell) {
 	Coordinate current_coord = cell_to_coord(current_cell);
-	
+
 	for (int i = 0; i < number_pieces_player; i++) {
 		if (player.pieces[i].coordinate.row == current_coord.row && player.pieces[i].coordinate.column == current_coord.column) {
 			return i;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -318,14 +327,14 @@ bool is_free(int x, int y){
   }
 
   return false;
-  
+
 }
 
 bool swap_piece(int x, int y, int new_x, int new_y, int shape){
 
 
-  marel_board[x][y] = '_';   
-  marel_board[new_x][new_y] = shape;    
+  marel_board[x][y] = '_';
+  marel_board[new_x][new_y] = shape;
 
 
 }
@@ -339,7 +348,7 @@ bool is_position_valid(int x, int y) {
     return false;
   }
 
-  
+
 }
 
 
@@ -390,7 +399,7 @@ void computer_move_pieces(char computer_shape) {
           }
 
         }
-                
+
       }
     }
   }
@@ -402,34 +411,47 @@ void computer_move_pieces(char computer_shape) {
 void move_pieces(bool has_computer_player, bool is_victory, Player player_one, Player player_two) {
 	while(!is_victory) {
 		snapshot_board(marel_board);
-		
+
 		int position_piece_in_player_one;
 		string current_coordinate_player_one;
 		string final_coordinate_player_one;
 		bool is_not_played_valid_one = true;
 
 		while(is_not_played_valid_one) {
-			
+
 			cout << "Player " + player_one.name << " choose the piece you are moving (according to the coordinates above on the map): ";
-			cin >> current_coordinate_player_one; 
-			
-			cout << "Player " + player_one.name << " choose where you move your piece (according to the coordinates above on the map): ";
-			cin >> final_coordinate_player_one;
-			
-			position_piece_in_player_one = get_position_piece(player_one, current_coordinate_player_one);
-			
-			is_not_played_valid_one = (position_piece_in_player_one == -1) || !check_move(player_one.pieces[position_piece_in_player_one].shape, current_coordinate_player_one, final_coordinate_player_one);
-						
-			if(is_not_played_valid_one) {
-				cout << "Invalid player movement, please try again " + player_one.name << endl << endl;
+			cin >> current_coordinate_player_one;
+
+			if(check_coord_to_be_moved(current_coordinate_player_one, player_one)){
+                cout << "Player " + player_one.name << " choose where you move your piece (according to the coordinates above on the map): ";
+                cin >> final_coordinate_player_one;
+
+                position_piece_in_player_one = get_position_piece(player_one, current_coordinate_player_one);
+
+                is_not_played_valid_one = (position_piece_in_player_one == -1) || !check_move(player_one.pieces[position_piece_in_player_one].shape, current_coordinate_player_one, final_coordinate_player_one);
+
+                if(is_not_played_valid_one) {
+                    endl(cout);
+                    cout << "Invalid player movement, please try again " + player_one.name << endl << endl;
+               		snapshot_board(marel_board);
+
+                }
+
+			}else{
+                 endl(cout);
+                 cout << "Invalid player movement, please try again " + player_one.name << endl << endl;
+                 snapshot_board(marel_board);
+
+
 			}
+
 		}
-		
+
 		move_piece(player_one.pieces[position_piece_in_player_one].shape, current_coordinate_player_one, final_coordinate_player_one);
 		player_one.pieces[position_piece_in_player_one].coordinate = cell_to_coord(final_coordinate_player_one);
-		
+
 		is_victory = check_victory(player_one.pieces);
-		
+
 		if (!is_victory) {
 			snapshot_board(marel_board);
 
@@ -440,36 +462,49 @@ void move_pieces(bool has_computer_player, bool is_victory, Player player_one, P
 				bool is_not_played_valid_two = true;
 
 				while(is_not_played_valid_two) {
-					
+
 					cout << "Player " + player_two.name << " choose the piece you are moving (according to the coordinates above on the map): ";
-					cin >> current_coordinate_player_two; 
-			
-					cout << "Player " + player_two.name << " choose where you move your piece (according to the coordinates above on the map): ";
-					cin >> final_coordinate_player_two;
-					
-					position_piece_in_player_two = get_position_piece(player_two, current_coordinate_player_two);
-			
-					is_not_played_valid_two = (position_piece_in_player_two == -1) || !check_move(player_two.pieces[position_piece_in_player_two].shape, current_coordinate_player_two, final_coordinate_player_two);
-				
-					if(is_not_played_valid_two) {
-						cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
+					cin >> current_coordinate_player_two;
+
+					if(check_coord_to_be_moved(current_coordinate_player_two, player_two)){
+
+                        cout << "Player " + player_two.name << " choose where you move your piece (according to the coordinates above on the map): ";
+                        cin >> final_coordinate_player_two;
+
+                        position_piece_in_player_two = get_position_piece(player_two, current_coordinate_player_two);
+
+                        is_not_played_valid_two = (position_piece_in_player_two == -1) || !check_move(player_two.pieces[position_piece_in_player_two].shape, current_coordinate_player_two, final_coordinate_player_two);
+
+                        if(is_not_played_valid_two) {
+                            endl(cout);
+                            cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
+                       		snapshot_board(marel_board);
+
+                        }
+
+					}else{
+                        endl(cout);
+                        cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
+                        snapshot_board(marel_board);
+
 					}
+
 				}
 
 				move_piece(player_two.pieces[position_piece_in_player_two].shape, current_coordinate_player_two, final_coordinate_player_two);
 				player_two.pieces[position_piece_in_player_two].coordinate = cell_to_coord(final_coordinate_player_two);
-				
+
 			} else {
         sleep();
 
         cout << player_two.name + " moved your piece on the board:" << endl;
         computer_move_pieces(player_two.pieces[0].shape);
 			}
-			
+
 			is_victory = check_victory(player_two.pieces);
-		}		
+		}
 	}
-	
+
 	Player player_win = (check_victory(player_one.pieces)) ? player_one : player_two;
 
   snapshot_board(marel_board);
@@ -508,6 +543,7 @@ void place_pieces(bool has_computer_player) {
 			is_not_played_valid_one = !check_coordinate(coordinate_player_one);
 
 			if(is_not_played_valid_one) {
+                endl(cout);
 				cout << "Invalid player movement, please try again " + player_one.name << endl << endl;
 			}
 		}
@@ -532,6 +568,7 @@ void place_pieces(bool has_computer_player) {
 					is_not_played_valid_two = !check_coordinate(coordinate_player_two);
 
 					if(is_not_played_valid_two) {
+                        endl(cout);
 						cout << "Invalid player movement, please try again " + player_two.name << endl << endl;
 					}
 				}
@@ -548,7 +585,7 @@ void place_pieces(bool has_computer_player) {
         player_two.pieces[count].coordinate.column = computer_coordinate.column;
         marel_board[computer_coordinate.row][computer_coordinate.column] = player_two.pieces[count].shape;
 			}
-			
+
 			// Just check the second player because the first one has already been verified
 			is_victory = (count == 2) && check_victory(player_two.pieces);
 		}
