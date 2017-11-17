@@ -258,8 +258,10 @@ Player get_human_player() {
   char piece_shape;
   cout << "Choose the name of your player: ";
   cin >> name;
-  cout << "Choose the shape of your piece: ";
+ 
+  cout << "Choose the shape of your piece (X or O): ";
   cin >> piece_shape;
+  
   cout << endl << " -- Welcome to the game " + name << " -- " << endl << endl;
   getline(cin, clearBuffer);
 
@@ -270,7 +272,7 @@ Player get_computer_player(char human_piece_shape) {
   string name = "Computer";
   char piece_shape = 'X';
 
-  if (human_piece_shape == 'X') {
+  if ((human_piece_shape == 'X' || human_piece_shape == 'x') && human_piece_shape != 'o') {
     piece_shape = 'O';
   }
 
