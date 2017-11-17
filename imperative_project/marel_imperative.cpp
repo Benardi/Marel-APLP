@@ -2,6 +2,7 @@
 #include <string> 
 #include <stdlib.h> 
 #include <ctime>
+#include <cmath> 
 
 using namespace std;
 
@@ -202,6 +203,10 @@ bool check_move(char current_player_piece_shape, string current_cell, string fin
 
   char piece_shape = marel_board[current_coord.row][current_coord.column];
   if (current_coord.row < 0 || current_coord.row > 2 || current_coord.column < 0 || current_coord.column > 2) {
+    return false;
+  } else if (!(abs(current_coord.column - final_coord.column) <= 1 && abs(current_coord.row - final_coord.row) == 0)
+            && !(abs(current_coord.row - final_coord.row) <= 1 && abs(current_coord.column - final_coord.column) == 0)
+            && !(final_coord.row == 1 && final_coord.column == 1)) {
     return false;
   } else if (piece_shape == '_') {
     return false;
