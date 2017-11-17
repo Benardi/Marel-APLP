@@ -259,7 +259,7 @@ Player get_human_player() {
   cout << "Choose the name of your player: ";
   cin >> name;
 
-  cout << "Choose the shape of your piece (X or O): ";
+  cout << "Choose the shape of your piece (example X or O): ";
   cin >> piece_shape;
 
   getline(cin, clearBuffer);
