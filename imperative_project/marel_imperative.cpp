@@ -1,8 +1,8 @@
 #include <iostream>
-#include <string> 
-#include <stdlib.h> 
+#include <string>
+#include <stdlib.h>
 #include <ctime>
-#include <cmath> 
+#include <cmath>
 
 using namespace std;
 
@@ -258,11 +258,10 @@ Player get_human_player() {
   char piece_shape;
   cout << "Choose the name of your player: ";
   cin >> name;
- 
+
   cout << "Choose the shape of your piece (X or O): ";
   cin >> piece_shape;
-  
-  cout << endl << " -- Welcome to the game " + name << " -- " << endl << endl;
+
   getline(cin, clearBuffer);
 
   return create_player(name, piece_shape);
@@ -330,7 +329,7 @@ void swap_piece(int x, int y, int new_x, int new_y, Player& player) {
   marel_board[new_x][new_y] = player.pieces[0].shape;
 
   for (int i = 0; i < 3; i++) {
-    if ((player.pieces[i].coordinate.row == x) 
+    if ((player.pieces[i].coordinate.row == x)
       && (player.pieces[i].coordinate.column == y)) {
         player.pieces[i].coordinate.row = new_x;
         player.pieces[i].coordinate.column = new_y;
@@ -489,11 +488,24 @@ void move_pieces(bool has_computer_player, bool is_victory, Player player_one, P
 void place_pieces(bool has_computer_player) {
   cout << " -- PLAYER ONE -- " << endl;
   Player player_one = get_human_player();
+  cout << endl << " -- Welcome to the game " + player_one.name << " -- " << endl << endl;
+
   Player player_two;
 
   if (!has_computer_player) {
-    cout << " -- PLAYER TWO -- " << endl;
-    player_two = get_human_player();
+    while(true){
+        cout << " -- PLAYER TWO -- " << endl;
+        player_two = get_human_player();
+        if(player_two.name != player_one.name && player_two.pieces[0].shape != player_one.pieces[0].shape){
+            break;
+        }
+        else{
+        endl(cout);
+        cout << "Players can't have same piece shape or name" << endl << endl;
+        }
+    }
+    cout << endl << " -- Welcome to the game " + player_two.name << " -- " << endl << endl;
+
   } else {
     player_two = get_computer_player(player_one.pieces[0].shape);
   }
