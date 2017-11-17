@@ -9,6 +9,7 @@ const int number_pieces_player = 3;
 
 char marel_board[3][3] = {{'_', '_', '_'}, {'_', '_', '_'}, {'_', '_', '_'}};
 char column_index[3] = {'A', 'B', 'C'};
+string clearBuffer;
 
 struct Coordinate {
   int row;
@@ -255,6 +256,7 @@ Player get_human_player() {
   cout << "Choose the shape of your piece: ";
   cin >> piece_shape;
   cout << endl << " -- Welcome to the game " + name << " -- " << endl << endl;
+  getline(cin, clearBuffer);
 
   return create_player(name, piece_shape);
 }
@@ -574,6 +576,7 @@ void main_menu() {
   cout << "Option: ";
   cin >> opcao;
   cout << endl;
+  getline(cin, clearBuffer);
 
   if (opcao == 1) {
     place_pieces(false);
