@@ -44,9 +44,17 @@ place_piece shape row column board = do
     let flat = [if x == row && y == column then shape else ((board !! x) !! y) | x <- [0..2], y <- [0..2]]
     create_board (slice 0 2 flat) (slice 3 5 flat) (slice 6 8 flat)
 
+is_valid_placement :: Int -> Int -> [[Char]] -> Bool
+is_valid_placement row column board
+    | row > 2 || row < 0 = False
+    | column > 2 || column < 0 = False
+    | (board !! row !! column) /= '_' = False
+    | otherwise = True
+
 main :: IO ()
 main = do
     shape <- getChar
     let marel_board  = [['X','X','_'],['_','X','_'],['_','X','_']]
     print (check_victory shape marel_board)
     print (place_piece 'X' 2 1 marel_board)
+    print (is_valid_placement 2 3 marel_board)
