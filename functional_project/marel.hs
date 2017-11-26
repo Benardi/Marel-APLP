@@ -51,16 +51,12 @@ check_victory shape board = do
 create_board :: [Char] -> [Char] -> [Char]-> [[Char]]
 create_board row1 row2 row3 = [row1,row2, row3]
 
-
 slice from to xs = take (to - from + 1) (drop from xs)
-
-addVal :: [Char] -> [Char] -> [Char]-> [[Char]]
-addVal row1 row2 row3 = [row1,row2, row3]
 
 place_piece :: Char -> Int -> Int -> [[Char]] -> [[Char]]
 place_piece shape row column board = do
     let flat = [if x == row && y == column then shape else ((board !! x) !! y) | x <- [0..2], y <- [0..2]]
-    addVal (slice 0 2 flat) (slice 3 5 flat) (slice 6 8 flat)
+    create_board (slice 0 2 flat) (slice 3 5 flat) (slice 6 8 flat)
 
 main :: IO ()
 main = do
