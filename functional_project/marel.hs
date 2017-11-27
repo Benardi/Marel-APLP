@@ -1,7 +1,22 @@
+data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
+
 check_left_diagonal :: Char -> [[Char]] -> Bool
 check_left_diagonal shape board = do
   (((board !! 0) !! 0 == shape) && ((board !! 1) !! 1 == shape) && ((board !! 2) !! 2 == shape))
 
+cell_to_coord :: String -> Coordinate
+cell_to_coord cell_name
+    | cell_name == "A1"  || cell_name == "a1" = Coordinate 0 0
+    | cell_name == "A2"  || cell_name == "a2" = Coordinate 0 1
+    | cell_name == "A3"  || cell_name == "a3" = Coordinate 0 2
+    | cell_name == "B1"  || cell_name == "b1" = Coordinate 1 0
+    | cell_name == "B1"  || cell_name == "b1" = Coordinate 1 0
+    | cell_name == "B2"  || cell_name == "b2" = Coordinate 1 1
+    | cell_name == "B3"  || cell_name == "b3" = Coordinate 1 2
+    | cell_name == "C1"  || cell_name == "c1" = Coordinate 2 0
+    | cell_name == "C2"  || cell_name == "c2" = Coordinate 2 1
+    | cell_name == "C3"  || cell_name == "c3" = Coordinate 2 2
+    | otherwise = Coordinate (-1) (-1)
 
 check_right_diagonal :: Char -> [[Char]] -> Bool
 check_right_diagonal shape board = do
@@ -62,12 +77,13 @@ is_valid_movememet row_org column_org row_des column_des board
     | (board !! row_org !! column_org) == '_' = False
     | otherwise = (is_valid_placement row_des column_des board)
 
-
 main :: IO ()
 main = do
     shape <- getChar
     let marel_board  = [['X','X','_'],['_','X','_'],['_','X','_']]
     print (check_victory shape marel_board)
+    let coord1 = (cell_to_coord "C2")
+    print coord1
     print (place_piece 'X' 2 2 (place_piece 'X' 2 0 marel_board))
     print (move_piece 2 1 1 0 marel_board)
     print (is_valid_placement 2 3 marel_board)
