@@ -1,9 +1,5 @@
 data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
 
-check_left_diagonal :: Char -> [[Char]] -> Bool
-check_left_diagonal shape board = do
-  (((board !! 0) !! 0 == shape) && ((board !! 1) !! 1 == shape) && ((board !! 2) !! 2 == shape))
-
 cell_to_coord :: String -> Coordinate
 cell_to_coord cell_name
     | cell_name == "A1"  || cell_name == "a1" = Coordinate 0 0
@@ -17,6 +13,10 @@ cell_to_coord cell_name
     | cell_name == "C2"  || cell_name == "c2" = Coordinate 2 1
     | cell_name == "C3"  || cell_name == "c3" = Coordinate 2 2
     | otherwise = Coordinate (-1) (-1)
+
+check_left_diagonal :: Char -> [[Char]] -> Bool
+check_left_diagonal shape board = do
+  (((board !! 0) !! 0 == shape) && ((board !! 1) !! 1 == shape) && ((board !! 2) !! 2 == shape))
 
 check_right_diagonal :: Char -> [[Char]] -> Bool
 check_right_diagonal shape board = do
@@ -54,28 +54,29 @@ create_board row1 row2 row3 = [row1,row2, row3]
 
 slice from to xs = take (to - from + 1) (drop from xs)
 
-place_piece :: Char -> Int -> Int -> [[Char]] -> [[Char]]
-place_piece shape row column board = do
-    let flat = [if x == row && y == column then shape else ((board !! x) !! y) | x <- [0..2], y <- [0..2]]
+place_piece :: Char -> String -> [[Char]] -> [[Char]]
+place_piece shape cell_name board = do
+    let coord = (cell_to_coord cell_name)
+    let flat = [if x == (row coord) && y == (column coord) then shape else ((board !! x) !! y) | x <- [0..2], y <- [0..2]]
     create_board (slice 0 2 flat) (slice 3 5 flat) (slice 6 8 flat)
 
-is_valid_placement :: Int -> Int -> [[Char]] -> Bool
-is_valid_placement row column board
-    | row > 2 || row < 0 = False
-    | column > 2 || column < 0 = False
-    | (board !! row !! column) /= '_' = False
+is_valid_placement :: String -> [[Char]] -> Bool
+is_valid_placement cell board
+    | (row (cell_to_coord cell)) == -1 || (column (cell_to_coord cell)) == -1 = False
+    | (board !! (row (cell_to_coord cell)) !! (column (cell_to_coord cell))) /= '_' = False
     | otherwise = True
 
-move_piece :: Int -> Int -> Int -> Int ->[[Char]] -> [[Char]]
-move_piece row_org column_org row_des column_des board = do
-      (place_piece '_' row_org column_org (place_piece (board !! row_org !! column_org) row_des column_des board))
+move_piece :: String -> String ->[[Char]] -> [[Char]]
+move_piece org_cell des_cell board = do
+      let org_coord = cell_to_coord org_cell
+      (place_piece '_' org_cell (place_piece (board !! (row org_coord) !! (column org_coord)) des_cell board))
 
-is_valid_movememet :: Int -> Int -> Int -> Int ->[[Char]] -> Bool
-is_valid_movememet row_org column_org row_des column_des board
-    | row_org > 2 || row_org < 0  = False
-    | column_org > 2 || column_org < 0  = False
-    | (board !! row_org !! column_org) == '_' = False
-    | otherwise = (is_valid_placement row_des column_des board)
+is_valid_movememet :: String -> String ->[[Char]] -> Bool
+is_valid_movememet org_cell des_cell board
+    | (row (cell_to_coord org_cell)) == -1 || (column (cell_to_coord org_cell)) == -1  = False
+    | (row (cell_to_coord des_cell)) == -1 || (column (cell_to_coord des_cell)) == -1  = False
+    | (board !! (row (cell_to_coord org_cell)) !! (column (cell_to_coord org_cell))) == '_' = False
+    | otherwise = (is_valid_placement des_cell board)
 
 main :: IO ()
 main = do
@@ -84,7 +85,7 @@ main = do
     print (check_victory shape marel_board)
     let coord1 = (cell_to_coord "C2")
     print coord1
-    print (place_piece 'X' 2 2 (place_piece 'X' 2 0 marel_board))
-    print (move_piece 2 1 1 0 marel_board)
-    print (is_valid_placement 2 3 marel_board)
-    print (is_valid_movememet 2 1 1 1 marel_board)
+    print (place_piece 'X' "C3" (place_piece 'X' "C1" marel_board))
+    print (move_piece "C2" "B1" marel_board)
+    print (is_valid_placement "A5" marel_board)
+    print (is_valid_movememet "C2" "B2" marel_board)
