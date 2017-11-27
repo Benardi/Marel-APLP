@@ -55,6 +55,14 @@ move_piece :: Int -> Int -> Int -> Int ->[[Char]] -> [[Char]]
 move_piece row_org column_org row_des column_des board = do
       (place_piece '_' row_org column_org (place_piece (board !! row_org !! column_org) row_des column_des board))
 
+is_valid_movememet :: Int -> Int -> Int -> Int ->[[Char]] -> Bool
+is_valid_movememet row_org column_org row_des column_des board
+    | row_org > 2 || row_org < 0  = False
+    | column_org > 2 || column_org < 0  = False
+    | (board !! row_org !! column_org) == '_' = False
+    | otherwise = (is_valid_placement row_des column_des board)
+
+
 main :: IO ()
 main = do
     shape <- getChar
@@ -63,3 +71,4 @@ main = do
     print (place_piece 'X' 2 2 (place_piece 'X' 2 0 marel_board))
     print (move_piece 2 1 1 0 marel_board)
     print (is_valid_placement 2 3 marel_board)
+    print (is_valid_movememet 2 1 1 1 marel_board)
