@@ -51,10 +51,15 @@ is_valid_placement row column board
     | (board !! row !! column) /= '_' = False
     | otherwise = True
 
+move_piece :: Int -> Int -> Int -> Int ->[[Char]] -> [[Char]]
+move_piece row_org column_org row_des column_des board = do
+      (place_piece '_' row_org column_org (place_piece (board !! row_org !! column_org) row_des column_des board))
+
 main :: IO ()
 main = do
     shape <- getChar
     let marel_board  = [['X','X','_'],['_','X','_'],['_','X','_']]
     print (check_victory shape marel_board)
-    print (place_piece 'X' 2 1 marel_board)
+    print (place_piece 'X' 2 2 (place_piece 'X' 2 0 marel_board))
+    print (move_piece 2 1 1 0 marel_board)
     print (is_valid_placement 2 3 marel_board)
