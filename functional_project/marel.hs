@@ -3,14 +3,13 @@ data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
 cell_to_coord :: String -> Coordinate
 cell_to_coord cell_name
     | cell_name == "A1"  || cell_name == "a1" = Coordinate 0 0
-    | cell_name == "A2"  || cell_name == "a2" = Coordinate 0 1
-    | cell_name == "A3"  || cell_name == "a3" = Coordinate 0 2
-    | cell_name == "B1"  || cell_name == "b1" = Coordinate 1 0
-    | cell_name == "B1"  || cell_name == "b1" = Coordinate 1 0
+    | cell_name == "A2"  || cell_name == "a2" = Coordinate 1 0
+    | cell_name == "A3"  || cell_name == "a3" = Coordinate 2 0
+    | cell_name == "B1"  || cell_name == "b1" = Coordinate 0 1
     | cell_name == "B2"  || cell_name == "b2" = Coordinate 1 1
-    | cell_name == "B3"  || cell_name == "b3" = Coordinate 1 2
-    | cell_name == "C1"  || cell_name == "c1" = Coordinate 2 0
-    | cell_name == "C2"  || cell_name == "c2" = Coordinate 2 1
+    | cell_name == "B3"  || cell_name == "b3" = Coordinate 2 1
+    | cell_name == "C1"  || cell_name == "c1" = Coordinate 0 2
+    | cell_name == "C2"  || cell_name == "c2" = Coordinate 1 2
     | cell_name == "C3"  || cell_name == "c3" = Coordinate 2 2
     | otherwise = Coordinate (-1) (-1)
 
@@ -71,12 +70,11 @@ move_piece org_cell des_cell board = do
       let org_coord = cell_to_coord org_cell
       (place_piece '_' org_cell (place_piece (board !! (row org_coord) !! (column org_coord)) des_cell board))
 
-is_valid_movememet :: String -> String ->[[Char]] -> Bool
-is_valid_movememet org_cell des_cell board
+is_valid_movement_orig :: String -> Char ->[[Char]] -> Bool
+is_valid_movement_orig org_cell shape board
     | (row (cell_to_coord org_cell)) == -1 || (column (cell_to_coord org_cell)) == -1  = False
-    | (row (cell_to_coord des_cell)) == -1 || (column (cell_to_coord des_cell)) == -1  = False
-    | (board !! (row (cell_to_coord org_cell)) !! (column (cell_to_coord org_cell))) == '_' = False
-    | otherwise = (is_valid_placement des_cell board)
+    | (board !! (row (cell_to_coord org_cell)) !! (column (cell_to_coord org_cell))) /= shape = False
+    | otherwise = True
 
 receive_placement board = do
   coord <- getLine
@@ -85,6 +83,14 @@ receive_placement board = do
   else do
     putStrLn("\nPlease choose a valid coordinate for your placement.")
     receive_placement board
+
+receive_movement board shape = do
+  org_cell <- getLine
+  if is_valid_movement_orig org_cell shape board
+    then return org_cell
+  else do
+    putStrLn("\nPlease choose a valid coordinate for your movement.")
+    receive_movement board shape
 
 placementRound 0  board shape1 shape2 = return board
 placementRound n board shape1 shape2 = do
@@ -98,6 +104,27 @@ placementRound n board shape1 shape2 = do
   snapshot_board board_plcm2
   placementRound (n-1) board_plcm2 shape1 shape2
 
+movementRound board shape1 shape2 = do
+  putStrLn("\nPlayer 1, Please choose a piece to be moved.")
+  coord1_from <- receive_movement board shape1
+  putStrLn("\nPlayer 1, Please choose to where it should be moved.")
+  coord1_to <- receive_placement board
+
+  let board_mvm1 = (move_piece coord1_from coord1_to board)
+  snapshot_board board_mvm1
+  if check_victory shape1 board_mvm1
+    then putStrLn("\n\tPlayer 1 has won\n")
+  else do
+    putStrLn("\nPlayer 2, Please choose a piece to be moved.")
+    coord2_from <- receive_movement board_mvm1 shape2
+    putStrLn("\nPlayer 2, Please choose to where it should be moved.")
+    coord2_to <- receive_placement board_mvm1
+    let board_mvm2 = (move_piece coord2_from coord2_to board_mvm1)
+    snapshot_board board_mvm2
+    if check_victory shape2 board_mvm2
+      then putStrLn("\n\tPlayer 2 has won\n")
+    else movementRound board_mvm2 shape1 shape2
+
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
   putStrLn("\n    A  B  C")
@@ -109,14 +136,24 @@ snapshot_board board = do
 main :: IO ()
 main = do
     let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
+    snapshot_board marel_board
+
     putStrLn("\nPlayer 1, please choose the shape of your piece.")
     shape1 <- getChar
     getLine -- cleans buffer
     putStrLn("\nPlayer 2, please choose the shape of your piece.")
     shape2 <- getChar
     getLine -- cleans buffer
+    snapshot_board marel_board
 
     board_past_placement <- placementRound 3 marel_board shape1 shape2
-    print("Why are there no feathers that sink down into the night.")
     snapshot_board board_past_placement
+
+    if check_victory shape1 board_past_placement
+      then putStrLn("\n\tPlayer 1 has won\n")
+    else do
+      if check_victory shape2 board_past_placement
+        then putStrLn("\n\tPlayer 2 has won\n")
+      else movementRound board_past_placement shape1 shape2
+
     return()
