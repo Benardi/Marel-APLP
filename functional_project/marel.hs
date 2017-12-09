@@ -1,3 +1,5 @@
+import System.IO
+
 data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
 
 cell_to_coord :: String -> Coordinate
@@ -91,23 +93,25 @@ receive_placement board = do
     print("Please choose a valid cell for your placement.")
     receive_placement board
 
-repeatTimes 0  board = return board
-repeatTimes n board = do
+repeatTimes 0  board shape1 shape2 = return board
+repeatTimes n board shape1 shape2 = do
   coord1 <- receive_placement board
   coord2 <- receive_placement board;
-  let temp_board = ((place_piece 'O' coord2 (place_piece 'X' coord1 board)))
+  let temp_board = ((place_piece shape2 coord2 (place_piece shape1 coord1 board)))
   print temp_board
-  repeatTimes (n-1) temp_board
+  repeatTimes (n-1) temp_board shape1 shape2
 
 
 main :: IO ()
 main = do
+    hSetBuffering stdin NoBuffering
     let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
-    shape1 <- getLine
-    shape2 <- getLine
+    shape1 <- getChar
+    getLine -- cleans buffer
+    shape2 <- getChar
+    getLine -- cleans buffer
 
-
-    board_past_placement <- repeatTimes 3 marel_board
+    board_past_placement <- repeatTimes 3 marel_board shape1 shape2
     print("Why are there no feathers that sink down into the night.")
     print(board_past_placement)
     return()
