@@ -78,14 +78,28 @@ is_valid_movememet org_cell des_cell board
     | (board !! (row (cell_to_coord org_cell)) !! (column (cell_to_coord org_cell))) == '_' = False
     | otherwise = (is_valid_placement des_cell board)
 
+-- repeatNTimes 0 _ = return()
+-- repeatNTimes n action = do
+--   action
+--   repeatNTimes (n-1) action
+
+repeatTimes 0  board = return board
+repeatTimes n board = do
+  coord1 <- getLine;
+  coord2 <- getLine;
+  let temp_board = ((place_piece 'O' coord2 (place_piece 'X' coord1 board)))
+  print temp_board
+  repeatTimes (n-1) temp_board
+
+
 main :: IO ()
 main = do
-    shape <- getChar
-    let marel_board  = [['X','X','_'],['_','X','_'],['_','X','_']]
-    print (check_victory shape marel_board)
-    let coord1 = (cell_to_coord "C2")
-    print coord1
-    print (place_piece 'X' "C3" (place_piece 'X' "C1" marel_board))
-    print (move_piece "C2" "B1" marel_board)
-    print (is_valid_placement "A5" marel_board)
-    print (is_valid_movememet "C2" "B2" marel_board)
+    let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
+    shape1 <- getLine
+    shape2 <- getLine
+
+
+    board_past_placement <- repeatTimes 3 marel_board
+    print("Why are there no feathers that sink down into the night.")
+    print(board_past_placement)
+    return()
