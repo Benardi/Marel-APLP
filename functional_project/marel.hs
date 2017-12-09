@@ -13,6 +13,14 @@ cell_to_coord cell_name
     | cell_name == "C3"  || cell_name == "c3" = Coordinate 2 2
     | otherwise = Coordinate (-1) (-1)
 
+welcoming_screen = do
+    putStrLn("\t################################################################")
+    putStrLn("\t#                MAREL - GAME OF THE THREE TRAILS              #")
+    putStrLn("\t#                   Play and have lots of fun                  #")
+    putStrLn("\t#                                                              #")
+    putStrLn("\t################################################################")
+    return()
+
 check_left_diagonal :: Char -> [[Char]] -> Bool
 check_left_diagonal shape board = do
   (((board !! 0) !! 0 == shape) && ((board !! 1) !! 1 == shape) && ((board !! 2) !! 2 == shape))
@@ -135,6 +143,7 @@ snapshot_board board = do
 
 main :: IO ()
 main = do
+    welcoming_screen
     let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
     snapshot_board marel_board
 
