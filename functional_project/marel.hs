@@ -1,5 +1,3 @@
-import System.IO
-
 data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
 
 cell_to_coord :: String -> Coordinate
@@ -90,28 +88,42 @@ receive_placement board = do
   if is_valid_placement coord board
     then return coord
   else do
-    print("Please choose a valid cell for your placement.")
+    putStrLn("\nPlease choose a valid coordinate for your placement.")
     receive_placement board
 
 repeatTimes 0  board shape1 shape2 = return board
 repeatTimes n board shape1 shape2 = do
+  putStrLn("\nPlayer 1, Please choose a coordinate to place your cell.")
   coord1 <- receive_placement board
-  coord2 <- receive_placement board;
-  let temp_board = ((place_piece shape2 coord2 (place_piece shape1 coord1 board)))
-  print temp_board
-  repeatTimes (n-1) temp_board shape1 shape2
+  let board_plcm1 = (place_piece shape1 coord1 board)
+  snapshot_board board_plcm1
+  putStrLn("\nPlayer 2, Please choose a coordinate to place your cell.")
+  coord2 <- receive_placement board_plcm1
+  let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
+  snapshot_board board_plcm2
+  repeatTimes (n-1) board_plcm2 shape1 shape2
 
+snapshot_board :: [[Char]] -> IO ()
+snapshot_board board = do
+  putStrLn("")
+  putStrLn("    A  B  C")
+  putStrLn(" 1  " ++ [((board !! 0) !! 0)] ++ "  " ++ [((board !! 0) !! 1)] ++ "  " ++ [((board !! 0) !! 2)])
+  putStrLn(" 2  " ++ [((board !! 1) !! 0)] ++ "  " ++ [((board !! 1) !! 1)] ++ "  " ++ [((board !! 1) !! 2)])
+  putStrLn(" 3  " ++ [((board !! 2) !! 0)] ++ "  " ++ [((board !! 2) !! 1)] ++ "  " ++ [((board !! 2) !! 2)])
+  putStrLn("")
+  return()
 
 main :: IO ()
 main = do
-    hSetBuffering stdin NoBuffering
     let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
+    putStrLn("\nPlayer 1, please choose the shape of your piece.")
     shape1 <- getChar
     getLine -- cleans buffer
+    putStrLn("\nPlayer 2, please choose the shape of your piece.")
     shape2 <- getChar
     getLine -- cleans buffer
 
     board_past_placement <- repeatTimes 3 marel_board shape1 shape2
     print("Why are there no feathers that sink down into the night.")
-    print(board_past_placement)
+    snapshot_board board_past_placement
     return()
