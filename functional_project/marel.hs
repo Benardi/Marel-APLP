@@ -83,10 +83,18 @@ is_valid_movememet org_cell des_cell board
 --   action
 --   repeatNTimes (n-1) action
 
+receive_placement board = do
+  coord <- getLine
+  if is_valid_placement coord board
+    then return coord
+  else do
+    print("Please choose a valid cell for your placement.")
+    receive_placement board
+
 repeatTimes 0  board = return board
 repeatTimes n board = do
-  coord1 <- getLine;
-  coord2 <- getLine;
+  coord1 <- receive_placement board
+  coord2 <- receive_placement board;
   let temp_board = ((place_piece 'O' coord2 (place_piece 'X' coord1 board)))
   print temp_board
   repeatTimes (n-1) temp_board
