@@ -78,6 +78,14 @@ move_piece org_cell des_cell board = do
       let org_coord = cell_to_coord org_cell
       (place_piece '_' org_cell (place_piece (board !! (row org_coord) !! (column org_coord)) des_cell board))
 
+is_valid_moviment ::  String -> String -> [[Char]] -> Bool 
+is_valid_moviment coord_from coord_to board
+    | not (is_valid_placement coord_to board) = False
+    | (abs((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to))) == 1) && ((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to)) == 0) = True
+    | (abs((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to))) == 1) && ((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to)) == 0) = True
+    | (column (cell_to_coord coord_to) == 1) && (row (cell_to_coord coord_to) == 1) = True
+    | otherwise = False
+
 is_valid_movement_orig :: String -> Char ->[[Char]] -> Bool
 is_valid_movement_orig org_cell shape board
     | (row (cell_to_coord org_cell)) == -1 || (column (cell_to_coord org_cell)) == -1  = False
@@ -106,32 +114,46 @@ placementRound n board shape1 shape2 = do
   coord1 <- receive_placement board
   let board_plcm1 = (place_piece shape1 coord1 board)
   snapshot_board board_plcm1
-  putStrLn("\nPlayer 2, Please choose a coordinate to place your cell.")
-  coord2 <- receive_placement board_plcm1
-  let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
-  snapshot_board board_plcm2
-  placementRound (n-1) board_plcm2 shape1 shape2
+  
+  if not (check_victory shape1 board_plcm1) then do
+    putStrLn("\nPlayer 2, Please choose a coordinate to place your cell.")
+    coord2 <- receive_placement board_plcm1
+    let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
+    snapshot_board board_plcm2
+    placementRound (n-1) board_plcm2 shape1 shape2
+  else return board_plcm1 
 
 movementRound board shape1 shape2 = do
   putStrLn("\nPlayer 1, Please choose a piece to be moved.")
   coord1_from <- receive_movement board shape1
   putStrLn("\nPlayer 1, Please choose to where it should be moved.")
-  coord1_to <- receive_placement board
+  coord1_to <- getLine
 
-  let board_mvm1 = (move_piece coord1_from coord1_to board)
-  snapshot_board board_mvm1
-  if check_victory shape1 board_mvm1
-    then putStrLn("\n\tPlayer 1 has won\n")
+  if is_valid_moviment coord1_from coord1_to board then do
+    let board_mvm1 = (move_piece coord1_from coord1_to board)
+    snapshot_board board_mvm1
+    if check_victory shape1 board_mvm1
+        then putStrLn("\n\tPlayer 1 has won\n")
+    else movementRoundPlayerTwo board_mvm1 shape1 shape2
   else do
-    putStrLn("\nPlayer 2, Please choose a piece to be moved.")
-    coord2_from <- receive_movement board_mvm1 shape2
-    putStrLn("\nPlayer 2, Please choose to where it should be moved.")
-    coord2_to <- receive_placement board_mvm1
-    let board_mvm2 = (move_piece coord2_from coord2_to board_mvm1)
+    putStrLn("\nInvalid move for player one, please choose a valid movement.")
+    movementRound board shape1 shape2
+
+movementRoundPlayerTwo board shape1 shape2 = do
+  putStrLn("\nPlayer 2, Please choose a piece to be moved.")
+  coord2_from <- receive_movement board shape2
+  putStrLn("\nPlayer 2, Please choose to where it should be moved.")
+  coord2_to <- getLine
+
+  if is_valid_moviment coord2_from coord2_to board then do
+    let board_mvm2 = (move_piece coord2_from coord2_to board)
     snapshot_board board_mvm2
     if check_victory shape2 board_mvm2
-      then putStrLn("\n\tPlayer 2 has won\n")
+        then putStrLn("\n\tPlayer 2 has won\n")
     else movementRound board_mvm2 shape1 shape2
+  else do
+    putStrLn("\nInvalid move for player two, please choose a valid movement.")
+    movementRoundPlayerTwo board shape1 shape2
 
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
