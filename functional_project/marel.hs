@@ -19,6 +19,11 @@ welcoming_screen = do
     putStrLn("\t#                   Play and have lots of fun                  #")
     putStrLn("\t#                                                              #")
     putStrLn("\t################################################################")
+    putStrLn("\nChoose an option:")
+    putStrLn("Option (1): play with a friend.")
+    putStrLn("Option (2): play with the computer.")
+    putStrLn("Option (anything): quit the game.")
+    putStrLn("Option is:")
     return()
 
 check_left_diagonal :: Char -> [[Char]] -> Bool
@@ -166,25 +171,30 @@ snapshot_board board = do
 main :: IO ()
 main = do
     welcoming_screen
-    let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
-    snapshot_board marel_board
+    option <- getLine
+    
+    if option == "1" || option == "2" then do
+        let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
+        snapshot_board marel_board
 
-    putStrLn("\nPlayer 1, please choose the shape of your piece.")
-    shape1 <- getChar
-    getLine -- cleans buffer
-    putStrLn("\nPlayer 2, please choose the shape of your piece.")
-    shape2 <- getChar
-    getLine -- cleans buffer
-    snapshot_board marel_board
+        putStrLn("\nPlayer 1, please choose the shape of your piece.")
+        shape1 <- getChar
+        getLine -- cleans buffer
+        
+        if option == "1" then do 
+            putStrLn("\nPlayer 2, please choose the shape of your piece.")
+            shape2 <- getChar
+            getLine -- cleans buffer
+            snapshot_board marel_board
 
-    board_past_placement <- placementRound 3 marel_board shape1 shape2
-    snapshot_board board_past_placement
+            board_past_placement <- placementRound 3 marel_board shape1 shape2
+            snapshot_board board_past_placement
 
-    if check_victory shape1 board_past_placement
-      then putStrLn("\n\tPlayer 1 has won\n")
-    else do
-      if check_victory shape2 board_past_placement
-        then putStrLn("\n\tPlayer 2 has won\n")
-      else movementRound board_past_placement shape1 shape2
-
-    return()
+            if check_victory shape1 board_past_placement
+                then putStrLn("\n\tPlayer 1 has won\n")
+            else do
+                if check_victory shape2 board_past_placement
+                    then putStrLn("\n\tPlayer 2 has won\n")
+                else movementRound board_past_placement shape1 shape2
+        else putStrLn("\nMovement of the computer in the implementation phase") -- Missing the implementation
+    else return()
