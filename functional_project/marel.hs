@@ -1,4 +1,8 @@
 data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
+data Player = Player{ name :: String } deriving (Show)
+
+playerName :: Player -> String
+playerName (Player name) = name
 
 cell_to_coord :: String -> Coordinate
 cell_to_coord cell_name
@@ -113,52 +117,52 @@ receive_movement board shape = do
     putStrLn("\nPlease choose a valid coordinate for your movement.")
     receive_movement board shape
 
-placementRound 0  board shape1 shape2 = return board
-placementRound n board shape1 shape2 = do
-  putStrLn("\nPlayer 1, Please choose a coordinate to place your cell.")
+placementRound 0  board player1 player2 shape1 shape2 = return board
+placementRound n board player1 player2 shape1 shape2 = do
+  putStrLn("\n" ++ (playerName player1) ++ ", Please choose a coordinate to place your cell.")
   coord1 <- receive_placement board
   let board_plcm1 = (place_piece shape1 coord1 board)
   snapshot_board board_plcm1
   
   if not (check_victory shape1 board_plcm1) then do
-    putStrLn("\nPlayer 2, Please choose a coordinate to place your cell.")
+    putStrLn("\n" ++ (playerName player2) ++ ", Please choose a coordinate to place your cell.")
     coord2 <- receive_placement board_plcm1
     let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
     snapshot_board board_plcm2
-    placementRound (n-1) board_plcm2 shape1 shape2
+    placementRound (n-1) board_plcm2 player1 player2 shape1 shape2
   else return board_plcm1 
 
-movementRound board shape1 shape2 = do
-  putStrLn("\nPlayer 1, Please choose a piece to be moved.")
+movementRound board player1 player2 shape1 shape2 = do
+  putStrLn("\n" ++ (playerName player1) ++ ", Please choose a piece to be moved.")
   coord1_from <- receive_movement board shape1
-  putStrLn("\nPlayer 1, Please choose to where it should be moved.")
+  putStrLn("\n" ++ (playerName player1) ++ ", Please choose to where it should be moved.")
   coord1_to <- getLine
 
   if is_valid_moviment coord1_from coord1_to board then do
     let board_mvm1 = (move_piece coord1_from coord1_to board)
     snapshot_board board_mvm1
     if check_victory shape1 board_mvm1
-        then putStrLn("\n\tPlayer 1 has won\n")
-    else movementRoundPlayerTwo board_mvm1 shape1 shape2
+        then putStrLn("\n" ++ (playerName player1) ++ " has won\n")
+    else movementRoundPlayerTwo board_mvm1 player1 player2 shape1 shape2
   else do
     putStrLn("\nInvalid move for player one, please choose a valid movement.")
-    movementRound board shape1 shape2
+    movementRound board player1 player2 shape1 shape2
 
-movementRoundPlayerTwo board shape1 shape2 = do
-  putStrLn("\nPlayer 2, Please choose a piece to be moved.")
+movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
+  putStrLn("\n" ++ (playerName player2) ++ ", Please choose a piece to be moved.")
   coord2_from <- receive_movement board shape2
-  putStrLn("\nPlayer 2, Please choose to where it should be moved.")
+  putStrLn("\n" ++ (playerName player2) ++ ", Please choose to where it should be moved.")
   coord2_to <- getLine
 
   if is_valid_moviment coord2_from coord2_to board then do
     let board_mvm2 = (move_piece coord2_from coord2_to board)
     snapshot_board board_mvm2
     if check_victory shape2 board_mvm2
-        then putStrLn("\n\tPlayer 2 has won\n")
-    else movementRound board_mvm2 shape1 shape2
+        then putStrLn("\n" ++ (playerName player2) ++ " has won\n")
+    else movementRound board_mvm2 player1 player2 shape1 shape2
   else do
     putStrLn("\nInvalid move for player two, please choose a valid movement.")
-    movementRoundPlayerTwo board shape1 shape2
+    movementRoundPlayerTwo board player1 player2 shape1 shape2
 
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
@@ -177,24 +181,30 @@ main = do
         let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
         snapshot_board marel_board
 
-        putStrLn("\nPlayer 1, please choose the shape of your piece.")
+        putStrLn("\nChoose the name of your player: ")
+        name <- getLine
+        let player1 = Player name
+        putStrLn("\n" ++ (playerName player1) ++ ", please choose the shape of your piece.")
         shape1 <- getChar
         getLine -- cleans buffer
         
-        if option == "1" then do 
-            putStrLn("\nPlayer 2, please choose the shape of your piece.")
+        if option == "1" then do
+            putStrLn("\nChoose the name of your player: ")
+            name <- getLine
+            let player2 = Player name 
+            putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece.")
             shape2 <- getChar
             getLine -- cleans buffer
             snapshot_board marel_board
 
-            board_past_placement <- placementRound 3 marel_board shape1 shape2
+            board_past_placement <- placementRound 3 marel_board player1 player2 shape1 shape2
             snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
-                then putStrLn("\n\tPlayer 1 has won\n")
+               then putStrLn((playerName player1) ++ " has won\n")
             else do
-                if check_victory shape2 board_past_placement
-                    then putStrLn("\n\tPlayer 2 has won\n")
-                else movementRound board_past_placement shape1 shape2
+               if check_victory shape2 board_past_placement
+                   then putStrLn((playerName player2) ++ " has won\n")
+               else movementRound board_past_placement player1 player2 shape1 shape2
         else putStrLn("\nMovement of the computer in the implementation phase") -- Missing the implementation
     else return()
