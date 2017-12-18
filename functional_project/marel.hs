@@ -1,3 +1,4 @@
+import Data.Map
 data Coordinate = Coordinate{ row :: Int, column :: Int} deriving (Show)
 data Player = Player{ name :: String } deriving (Show)
 
@@ -16,6 +17,19 @@ cell_to_coord cell_name
     | cell_name == "C2"  || cell_name == "c2" = Coordinate 1 2
     | cell_name == "C3"  || cell_name == "c3" = Coordinate 2 2
     | otherwise = Coordinate (-1) (-1)
+
+coord_to_cell :: Coordinate -> String
+coord_to_cell coordinate
+    | row coordinate == 0 && column coordinate == 0 = "A1"
+    | row coordinate == 1 && column coordinate == 0 = "A2"
+    | row coordinate == 2 && column coordinate == 0 = "A3"
+    | row coordinate == 0 && column coordinate == 1 = "B1"
+    | row coordinate == 1 && column coordinate == 1 = "B2"
+    | row coordinate == 2 && column coordinate == 1 = "B3"
+    | row coordinate == 0 && column coordinate == 2 = "C1"
+    | row coordinate == 1 && column coordinate == 2 = "C2"
+    | row coordinate == 2 && column coordinate == 2 = "C3"
+    | otherwise = "XX"    
 
 welcoming_screen = do
     putStrLn("\t################################################################")
@@ -102,6 +116,71 @@ is_valid_movement_orig org_cell shape board
     | (board !! (row (cell_to_coord org_cell)) !! (column (cell_to_coord org_cell))) /= shape = False
     | otherwise = True
 
+get_shape_computer :: Char -> Char
+get_shape_computer shape_player = if (shape_player == 'X') || (shape_player == 'x') then 'O' else 'X'  
+
+is_adjacent_move :: String -> String -> Bool
+is_adjacent_move coord_from coord_to
+    | (row (cell_to_coord coord_to)) == -1 || (column (cell_to_coord coord_to)) == -1 = False
+    | (abs((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to))) == 1) && ((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to)) == 0) = True
+    | (abs((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to))) == 1) && ((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to)) == 0) = True
+    | (column (cell_to_coord coord_to) == 1) && (row (cell_to_coord coord_to) == 1) = True
+    | (column (cell_to_coord coord_from) == 1) && (row (cell_to_coord coord_from) == 1) = True
+    | otherwise = False
+
+get_moves_computer :: [[Char]] -> [String] -> Map String [String] -> Map String [String]
+get_moves_computer board [] possible_moves = possible_moves  
+get_moves_computer board pieces possible_moves = do 
+    get_moves_computer board (tail pieces) (Data.Map.insert (head pieces) [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (is_valid_moviment (head pieces) (coord_to_cell (Coordinate x y)) board)] possible_moves)
+
+get_adjacent_pieces :: String -> String -> [String]
+get_adjacent_pieces piece_from piece_to = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (coord_to_cell (Coordinate x y)) /= piece_to, (coord_to_cell (Coordinate x y)) /= piece_from, (is_adjacent_move piece_to (coord_to_cell (Coordinate x y)))]
+
+is_possible_move_victory :: [[Char]] -> Char -> String -> [String] -> String
+is_possible_move_victory board shape piece [] = "XX"
+is_possible_move_victory board shape piece moves = do
+    let board_after_move = (place_piece '_' piece (place_piece shape (head moves) board))
+    if check_victory shape board_after_move then (head moves) else do
+	    is_possible_move_victory board shape piece (tail moves)
+
+is_possible_victory :: [[Char]] -> Char ->  Map String [String] -> [String] -> (String, String)
+is_possible_victory board shape possible_moves [] = ("XX", "XX")
+is_possible_victory board shape possible_moves pieces = do
+    let possible_move_victory = (is_possible_move_victory board shape (head pieces) (possible_moves ! (head pieces)))
+    if possible_move_victory == "XX" then is_possible_victory board shape possible_moves (tail pieces) else ((head pieces), possible_move_victory) 
+
+is_possible_adjacent_piece :: [[Char]] -> Char -> String -> [String] -> String
+is_possible_adjacent_piece board shape_computer piece [] = "XX"
+is_possible_adjacent_piece board shape_computer piece moves = do
+    let moves_adjacent = [y | y <- (get_adjacent_pieces piece (head moves)), (board !! (row (cell_to_coord y)) !! (column (cell_to_coord y))) == shape_computer]
+    if moves_adjacent /= [] then (head moves) else do
+	    is_possible_adjacent_piece board shape_computer piece (tail moves)
+
+is_possible_adjacent_pieces :: [[Char]] -> Char ->  Map String [String] -> [String] -> (String, String)
+is_possible_adjacent_pieces board shape_computer possible_moves [] = ("XX", "XX")
+is_possible_adjacent_pieces board shape_computer possible_moves pieces = do
+    let possible_adjacent_move = (is_possible_adjacent_piece board shape_computer (head pieces) (possible_moves ! (head pieces)))
+    if possible_adjacent_move == "XX" then is_possible_adjacent_pieces board shape_computer possible_moves (tail pieces) else ((head pieces), possible_adjacent_move)
+
+get_anything_move :: Map String [String] -> [String] -> (String, String)
+get_anything_move possible_moves [] = ("XX", "XX")
+get_anything_move possible_moves pieces = do
+    let moves = (possible_moves ! (head pieces))
+    if moves /= [] then ((head pieces), (head moves)) else get_anything_move possible_moves (tail pieces) 
+
+get_best_move_computer :: [[Char]] -> Char -> Char ->  Map String [String] -> (String, String)
+get_best_move_computer board shape_player shape_computer possible_moves = do
+    let move_victory = is_possible_victory board shape_computer possible_moves (keys possible_moves)
+    if move_victory == ("XX", "XX") then do
+	    let move_enemy_victory = is_possible_victory board shape_player possible_moves (keys possible_moves)
+	    if move_enemy_victory == ("XX", "XX") then do
+		    let move_adjacent_piece = is_possible_adjacent_pieces board shape_computer possible_moves (keys possible_moves)
+		    if move_adjacent_piece == ("XX", "XX") then do
+			    get_anything_move possible_moves (keys possible_moves)
+		    else move_adjacent_piece
+	    else move_enemy_victory
+    else move_victory
+
 receive_placement board = do
   coord <- getLine
   if is_valid_placement coord board
@@ -133,7 +212,7 @@ placementRound n board player1 player2 shape1 shape2 = do
     placementRound (n-1) board_plcm2 player1 player2 shape1 shape2
   else return board_plcm1 
 
-movementRound board player1 player2 shape1 shape2 = do
+movementRound board player1 player2 shape1 shape2 is_player_computer = do
   putStrLn("\n" ++ (playerName player1) ++ ", Please choose a piece to be moved.")
   coord1_from <- receive_movement board shape1
   putStrLn("\n" ++ (playerName player1) ++ ", Please choose to where it should be moved.")
@@ -144,10 +223,12 @@ movementRound board player1 player2 shape1 shape2 = do
     snapshot_board board_mvm1
     if check_victory shape1 board_mvm1
         then putStrLn("\n" ++ (playerName player1) ++ " has won\n")
-    else movementRoundPlayerTwo board_mvm1 player1 player2 shape1 shape2
+    else do
+        if is_player_computer then movementRoundPlayerComputer board_mvm1 player1 player2 shape1 shape2
+        else movementRoundPlayerTwo board_mvm1 player1 player2 shape1 shape2
   else do
     putStrLn("\nInvalid move for player one, please choose a valid movement.")
-    movementRound board player1 player2 shape1 shape2
+    movementRound board player1 player2 shape1 shape2 is_player_computer
 
 movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
   putStrLn("\n" ++ (playerName player2) ++ ", Please choose a piece to be moved.")
@@ -160,10 +241,22 @@ movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
     snapshot_board board_mvm2
     if check_victory shape2 board_mvm2
         then putStrLn("\n" ++ (playerName player2) ++ " has won\n")
-    else movementRound board_mvm2 player1 player2 shape1 shape2
+    else movementRound board_mvm2 player1 player2 shape1 shape2 False
   else do
     putStrLn("\nInvalid move for player two, please choose a valid movement.")
     movementRoundPlayerTwo board player1 player2 shape1 shape2
+
+movementRoundPlayerComputer board player1 player_computer shape1 shape_computer = do
+  let pieces_computer = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == shape_computer]
+  let possibles_moves = get_moves_computer board pieces_computer Data.Map.empty
+  let best_move = get_best_move_computer board shape1 shape_computer possibles_moves
+  let board_mvm2 = (move_piece (fst best_move) (snd best_move) board)
+  snapshot_board board_mvm2
+  if check_victory shape_computer board_mvm2
+      then putStrLn("\nComputer has won\n")
+  else do
+    putStrLn("\nThe computer player made his move.")
+    movementRound board_mvm2 player1 player_computer shape1 shape_computer True
 
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
@@ -206,6 +299,19 @@ main = do
             else do
                if check_victory shape2 board_past_placement
                    then putStrLn((playerName player2) ++ " has won\n")
-               else movementRound board_past_placement player1 player2 shape1 shape2
-        else putStrLn("\nMovement of the computer in the implementation phase") -- Missing the implementation
+               else movementRound board_past_placement player1 player2 shape1 shape2 False
+        else do 
+            let player_computer = Player "Computer" 
+            let shape_computer = get_shape_computer shape1
+            snapshot_board marel_board
+
+            board_past_placement <- placementRound 3 marel_board player1 player_computer shape1 shape_computer
+            snapshot_board board_past_placement
+
+            if check_victory shape1 board_past_placement
+               then putStrLn((playerName player1) ++ " has won\n")
+            else do
+               if check_victory shape_computer board_past_placement
+                   then putStrLn((playerName player_computer) ++ " has won\n")
+               else movementRound board_past_placement player1 player_computer shape1 shape_computer True
     else return()
