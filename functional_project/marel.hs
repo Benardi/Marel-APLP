@@ -93,6 +93,7 @@ is_valid_moviment coord_from coord_to board
     | (abs((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to))) == 1) && ((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to)) == 0) = True
     | (abs((column (cell_to_coord coord_from)) - (column (cell_to_coord coord_to))) == 1) && ((row (cell_to_coord coord_from)) - (row (cell_to_coord coord_to)) == 0) = True
     | (column (cell_to_coord coord_to) == 1) && (row (cell_to_coord coord_to) == 1) = True
+    | (column (cell_to_coord coord_from) == 1) && (row (cell_to_coord coord_from) == 1) = True
     | otherwise = False
 
 is_valid_movement_orig :: String -> Char ->[[Char]] -> Bool
@@ -181,7 +182,7 @@ main = do
         let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
         snapshot_board marel_board
 
-        putStrLn("\nChoose the name of your player: ")
+        putStrLn("\nPlayer one choose the name of your player: ")
         name <- getLine
         let player1 = Player name
         putStrLn("\n" ++ (playerName player1) ++ ", please choose the shape of your piece.")
@@ -189,7 +190,7 @@ main = do
         getLine -- cleans buffer
         
         if option == "1" then do
-            putStrLn("\nChoose the name of your player: ")
+            putStrLn("\nPlayer two choose the name of your player: ")
             name <- getLine
             let player2 = Player name 
             putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece.")
