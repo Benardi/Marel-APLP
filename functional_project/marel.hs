@@ -52,7 +52,6 @@ check_right_diagonal :: Char -> [[Char]] -> Bool
 check_right_diagonal shape board = do
   (((board !! 0) !! 2 == shape) && ((board !! 1) !! 1 == shape) && ((board !! 2) !! 0 == shape))
 
-
 check_all_diagonals :: Char -> [[Char]] -> Bool
 check_all_diagonals shape board = do
   ((check_left_diagonal shape board) || (check_right_diagonal shape board))
@@ -77,7 +76,6 @@ check_all_columns shape board = do
 check_victory :: Char -> [[Char]] -> Bool
 check_victory shape board = do
   ((check_all_diagonals shape board) || (check_all_rows shape board) || (check_all_columns shape board))
-
 
 create_board :: [Char] -> [Char] -> [Char]-> [[Char]]
 create_board row1 row2 row3 = [row1,row2, row3]
@@ -136,31 +134,31 @@ get_moves_computer board pieces possible_moves = do
 get_adjacent_pieces :: String -> String -> [String]
 get_adjacent_pieces piece_from piece_to = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (coord_to_cell (Coordinate x y)) /= piece_to, (coord_to_cell (Coordinate x y)) /= piece_from, (is_adjacent_move piece_to (coord_to_cell (Coordinate x y)))]
 
-is_possible_move_victory :: [[Char]] -> Char -> String -> [String] -> String
-is_possible_move_victory board shape piece [] = "XX"
-is_possible_move_victory board shape piece moves = do
+get_possible_move_victory :: [[Char]] -> Char -> String -> [String] -> String
+get_possible_move_victory board shape piece [] = "XX"
+get_possible_move_victory board shape piece moves = do
     let board_after_move = (place_piece '_' piece (place_piece shape (head moves) board))
     if check_victory shape board_after_move then (head moves) else do
-	    is_possible_move_victory board shape piece (tail moves)
+        get_possible_move_victory board shape piece (tail moves)
 
-is_possible_victory :: [[Char]] -> Char ->  Map String [String] -> [String] -> (String, String)
-is_possible_victory board shape possible_moves [] = ("XX", "XX")
-is_possible_victory board shape possible_moves pieces = do
-    let possible_move_victory = (is_possible_move_victory board shape (head pieces) (possible_moves ! (head pieces)))
-    if possible_move_victory == "XX" then is_possible_victory board shape possible_moves (tail pieces) else ((head pieces), possible_move_victory) 
+get_possible_victory :: [[Char]] -> Char -> Map String [String] -> [String] -> (String, String)
+get_possible_victory board shape possible_moves [] = ("XX", "XX")
+get_possible_victory board shape possible_moves pieces = do
+    let possible_move_victory = (get_possible_move_victory board shape (head pieces) (possible_moves ! (head pieces)))
+    if possible_move_victory == "XX" then get_possible_victory board shape possible_moves (tail pieces) else ((head pieces), possible_move_victory) 
 
-is_possible_adjacent_piece :: [[Char]] -> Char -> String -> [String] -> String
-is_possible_adjacent_piece board shape_computer piece [] = "XX"
-is_possible_adjacent_piece board shape_computer piece moves = do
+get_possible_adjacent_piece :: [[Char]] -> Char -> String -> [String] -> String
+get_possible_adjacent_piece board shape_computer piece [] = "XX"
+get_possible_adjacent_piece board shape_computer piece moves = do
     let moves_adjacent = [y | y <- (get_adjacent_pieces piece (head moves)), (board !! (row (cell_to_coord y)) !! (column (cell_to_coord y))) == shape_computer]
     if moves_adjacent /= [] then (head moves) else do
-	    is_possible_adjacent_piece board shape_computer piece (tail moves)
+        get_possible_adjacent_piece board shape_computer piece (tail moves)
 
-is_possible_adjacent_pieces :: [[Char]] -> Char ->  Map String [String] -> [String] -> (String, String)
-is_possible_adjacent_pieces board shape_computer possible_moves [] = ("XX", "XX")
-is_possible_adjacent_pieces board shape_computer possible_moves pieces = do
-    let possible_adjacent_move = (is_possible_adjacent_piece board shape_computer (head pieces) (possible_moves ! (head pieces)))
-    if possible_adjacent_move == "XX" then is_possible_adjacent_pieces board shape_computer possible_moves (tail pieces) else ((head pieces), possible_adjacent_move)
+get_possible_adjacent_pieces :: [[Char]] -> Char -> Map String [String] -> [String] -> (String, String)
+get_possible_adjacent_pieces board shape_computer possible_moves [] = ("XX", "XX")
+get_possible_adjacent_pieces board shape_computer possible_moves pieces = do
+    let possible_adjacent_move = (get_possible_adjacent_piece board shape_computer (head pieces) (possible_moves ! (head pieces)))
+    if possible_adjacent_move == "XX" then get_possible_adjacent_pieces board shape_computer possible_moves (tail pieces) else ((head pieces), possible_adjacent_move)
 
 get_anything_move :: Map String [String] -> [String] -> (String, String)
 get_anything_move possible_moves [] = ("XX", "XX")
@@ -168,17 +166,22 @@ get_anything_move possible_moves pieces = do
     let moves = (possible_moves ! (head pieces))
     if moves /= [] then ((head pieces), (head moves)) else get_anything_move possible_moves (tail pieces) 
 
-get_best_move_computer :: [[Char]] -> Char -> Char ->  Map String [String] -> (String, String)
+-- Order of priority of movements:
+-- 1. If movement is movement to win
+-- 2. If the movement is a movement that prevents the player from winning
+-- 3. If the movement leaves you close to your pieces
+-- 4. Any possible movement
+get_best_move_computer :: [[Char]] -> Char -> Char -> Map String [String] -> (String, String)
 get_best_move_computer board shape_player shape_computer possible_moves = do
-    let move_victory = is_possible_victory board shape_computer possible_moves (keys possible_moves)
+    let move_victory = get_possible_victory board shape_computer possible_moves (keys possible_moves)
     if move_victory == ("XX", "XX") then do
-	    let move_enemy_victory = is_possible_victory board shape_player possible_moves (keys possible_moves)
-	    if move_enemy_victory == ("XX", "XX") then do
-		    let move_adjacent_piece = is_possible_adjacent_pieces board shape_computer possible_moves (keys possible_moves)
-		    if move_adjacent_piece == ("XX", "XX") then do
-			    get_anything_move possible_moves (keys possible_moves)
-		    else move_adjacent_piece
-	    else move_enemy_victory
+        let move_enemy_victory = get_possible_victory board shape_player possible_moves (keys possible_moves)
+        if move_enemy_victory == ("XX", "XX") then do
+            let move_adjacent_piece = get_possible_adjacent_pieces board shape_computer possible_moves (keys possible_moves)
+            if move_adjacent_piece == ("XX", "XX") then do
+                get_anything_move possible_moves (keys possible_moves)
+            else move_adjacent_piece
+        else move_enemy_victory
     else move_victory
 
 receive_placement board = do
@@ -247,6 +250,7 @@ movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
     movementRoundPlayerTwo board player1 player2 shape1 shape2
 
 movementRoundPlayerComputer board player1 player_computer shape1 shape_computer = do
+  putStrLn("\nMovement of the computer.")
   let pieces_computer = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == shape_computer]
   let possibles_moves = get_moves_computer board pieces_computer Data.Map.empty
   let best_move = get_best_move_computer board shape1 shape_computer possibles_moves
@@ -304,7 +308,8 @@ main = do
             let player_computer = Player "Computer" 
             let shape_computer = get_shape_computer shape1
             snapshot_board marel_board
-
+            
+            -- To do: implement place pieces for the computer
             board_past_placement <- placementRound 3 marel_board player1 player_computer shape1 shape_computer
             snapshot_board board_past_placement
 
