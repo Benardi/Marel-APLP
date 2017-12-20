@@ -169,15 +169,11 @@ selectShape2 shape1 = do
   shapeTwo <- getChar
   getLine -- cleans buffer
 
-  if shapeTwo == shape1 
-  	then do
-  		putStrLn("Letter already in use, please select another letter") 
-  		selectShape2 shape1
+  if shapeTwo == shape1 then do
+    putStrLn("Letter already in use, please select another letter") 
+    selectShape2 shape1
   else do
-  	putStrLn("Letter Selected :) ")
-	return shapeTwo
-
-
+    return shapeTwo
 
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
@@ -219,7 +215,7 @@ main = do
                then putStrLn((playerName player1) ++ " has won\n")
             else do
                if check_victory shape2 board_past_placement
-                   then putStrLn((playerName player2) ++ " has won\n")
+                  then putStrLn((playerName player2) ++ " has won\n")
                else movementRound board_past_placement player1 player2 shape1 shape2
         else putStrLn("\nMovement of the computer in the implementation phase") -- Missing the implementation
     else return()
