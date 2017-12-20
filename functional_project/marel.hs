@@ -165,13 +165,13 @@ movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
     putStrLn("\nInvalid move for player two, please choose a valid movement.")
     movementRoundPlayerTwo board player1 player2 shape1 shape2
 
-selectShape2 shape1 = do
+selectShape2 player2 shape1 = do
   shapeTwo <- getChar
   getLine -- cleans buffer
 
   if shapeTwo == shape1 then do
-    putStrLn("Letter already in use, please select another letter") 
-    selectShape2 shape1
+    putStrLn("\n" ++ (playerName player2) ++ ", please choose a different shape of: " ++ [shape1])
+    selectShape2 player2 shape1
   else do
     return shapeTwo
 
@@ -204,7 +204,7 @@ main = do
             name <- getLine
             let player2 = Player name 
             putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece.")
-            shape2 <- selectShape2 shape1
+            shape2 <- selectShape2 player2 shape1
             
             snapshot_board marel_board
 
