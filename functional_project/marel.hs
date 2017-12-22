@@ -41,7 +41,7 @@ welcoming_screen = do
     putStrLn("Option (1): play with a friend.")
     putStrLn("Option (2): play with the computer.")
     putStrLn("Option (anything): quit the game.")
-    putStrLn("Option is:")
+    putStrLn("\nOption is: ")
     return()
 
 check_left_diagonal :: Char -> [[Char]] -> Bool
@@ -231,7 +231,7 @@ receive_placement board = do
   if is_valid_placement coord board
     then return coord
   else do
-    putStrLn("\nPlease choose a valid coordinate for your placement.")
+    putStrLn("\nPlease choose a valid coordinate for your placement: ")
     receive_placement board
 
 receive_movement board shape = do
@@ -239,13 +239,13 @@ receive_movement board shape = do
   if is_valid_movement_orig org_cell shape board
     then return org_cell
   else do
-    putStrLn("\nPlease choose a valid coordinate for your movement.")
+    putStrLn("\nPlease choose a valid coordinate for your movement: ")
     receive_movement board shape
 
 placementRound :: Int -> [[Char]] -> Player -> Player -> Char -> Char -> Bool -> IO [[Char]]
 placementRound 0  board player1 player2 shape1 shape2 is_player_computer = return board
 placementRound n board player1 player2 shape1 shape2 is_player_computer = do
-  putStrLn("\n" ++ (playerName player1) ++ ", Please choose a coordinate to place your cell.")
+  putStrLn("\n" ++ (playerName player1) ++ ", please choose a coordinate to place your cell: ")
   coord1 <- receive_placement board
   let board_plcm1 = (place_piece shape1 coord1 board)
   snapshot_board board_plcm1
@@ -258,7 +258,7 @@ placementRound n board player1 player2 shape1 shape2 is_player_computer = do
         snapshot_board board_plcm2
         placementRound (n-1) board_plcm2 player1 player2 shape1 shape2 is_player_computer
     else do
-        putStrLn("\n" ++ (playerName player2) ++ ", Please choose a coordinate to place your cell.")
+        putStrLn("\n" ++ (playerName player2) ++ ", please choose a coordinate to place your cell: ")
         coord2 <- receive_placement board_plcm1
         let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
         snapshot_board board_plcm2
@@ -267,16 +267,16 @@ placementRound n board player1 player2 shape1 shape2 is_player_computer = do
 
 movementRound :: [[Char]] -> Player -> Player -> Char -> Char -> Bool -> IO ()
 movementRound board player1 player2 shape1 shape2 is_player_computer = do
-  putStrLn("\n" ++ (playerName player1) ++ ", Please choose a piece to be moved.")
+  putStrLn("\n" ++ (playerName player1) ++ ", please choose a piece to be moved: ")
   coord1_from <- receive_movement board shape1
-  putStrLn("\n" ++ (playerName player1) ++ ", Please choose to where it should be moved.")
+  putStrLn("\n" ++ (playerName player1) ++ ", please choose to where it should be moved: ")
   coord1_to <- getLine
 
   if is_valid_moviment coord1_from coord1_to board then do
     let board_mvm1 = (move_piece coord1_from coord1_to board)
     snapshot_board board_mvm1
     if check_victory shape1 board_mvm1
-        then putStrLn("\n" ++ (playerName player1) ++ " has won\n")
+        then putStrLn("\n" ++ (playerName player1) ++ " has won!\n")
     else do
         if is_player_computer then movementRoundPlayerComputer board_mvm1 player1 player2 shape1 shape2
         else movementRoundPlayerTwo board_mvm1 player1 player2 shape1 shape2
@@ -285,16 +285,16 @@ movementRound board player1 player2 shape1 shape2 is_player_computer = do
     movementRound board player1 player2 shape1 shape2 is_player_computer
 
 movementRoundPlayerTwo board player1 player2 shape1 shape2 = do
-  putStrLn("\n" ++ (playerName player2) ++ ", Please choose a piece to be moved.")
+  putStrLn("\n" ++ (playerName player2) ++ ", please choose a piece to be moved: ")
   coord2_from <- receive_movement board shape2
-  putStrLn("\n" ++ (playerName player2) ++ ", Please choose to where it should be moved.")
+  putStrLn("\n" ++ (playerName player2) ++ ", please choose to where it should be moved: ")
   coord2_to <- getLine
 
   if is_valid_moviment coord2_from coord2_to board then do
     let board_mvm2 = (move_piece coord2_from coord2_to board)
     snapshot_board board_mvm2
     if check_victory shape2 board_mvm2
-        then putStrLn("\n" ++ (playerName player2) ++ " has won\n")
+        then putStrLn("\n" ++ (playerName player2) ++ " has won!\n")
     else movementRound board_mvm2 player1 player2 shape1 shape2 False
   else do
     putStrLn("\nInvalid move for player two, please choose a valid movement.")
@@ -308,7 +308,7 @@ movementRoundPlayerComputer board player1 player_computer shape1 shape_computer 
   let board_mvm2 = (move_piece (fst best_move) (snd best_move) board)
   snapshot_board board_mvm2
   if check_victory shape_computer board_mvm2
-      then putStrLn("\nComputer has won\n")
+      then putStrLn("\nComputer has won!\n")
   else do
     putStrLn("\nThe computer player made his move.")
     movementRound board_mvm2 player1 player_computer shape1 shape_computer True
@@ -318,7 +318,7 @@ selectShape2 player2 shape1 = do
   getLine -- cleans buffer
 
   if shapeTwo == shape1 then do
-    putStrLn("\n" ++ (playerName player2) ++ ", please choose a different shape of: " ++ [shape1])
+    putStrLn("\n" ++ (playerName player2) ++ ", please choose a different shape of " ++ [shape1] ++ ": ")
     selectShape2 player2 shape1
   else do
     return shapeTwo
@@ -343,7 +343,7 @@ main = do
         putStrLn("\nPlayer one choose the name of your player: ")
         name <- getLine
         let player1 = Player name
-        putStrLn("\n" ++ (playerName player1) ++ ", please choose the shape of your piece.")
+        putStrLn("\n" ++ (playerName player1) ++ ", please choose the shape of your piece: ")
         shape1 <- getChar
         getLine -- cleans buffer
         
@@ -351,7 +351,7 @@ main = do
             putStrLn("\nPlayer two choose the name of your player: ")
             name <- getLine
             let player2 = Player name 
-            putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece.")
+            putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece: ")
             shape2 <- selectShape2 player2 shape1
             
             snapshot_board marel_board
@@ -360,10 +360,10 @@ main = do
             snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
-               then putStrLn((playerName player1) ++ " has won\n")
+               then putStrLn((playerName player1) ++ " has won!\n")
             else do
                if check_victory shape2 board_past_placement
-                   then putStrLn((playerName player2) ++ " has won\n")
+                   then putStrLn((playerName player2) ++ " has won!\n")
                else movementRound board_past_placement player1 player2 shape1 shape2 False
         else do 
             let player_computer = Player "Computer" 
@@ -375,9 +375,9 @@ main = do
             snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
-               then putStrLn((playerName player1) ++ " has won\n")
+               then putStrLn((playerName player1) ++ " has won!\n")
             else do
                if check_victory shape_computer board_past_placement
-                   then putStrLn((playerName player_computer) ++ " has won\n")
+                   then putStrLn((playerName player_computer) ++ " has won!\n")
                else movementRound board_past_placement player1 player_computer shape1 shape_computer True
     else return()
