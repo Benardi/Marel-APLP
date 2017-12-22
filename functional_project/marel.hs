@@ -184,6 +184,48 @@ get_best_move_computer board shape_player shape_computer possible_moves = do
         else move_enemy_victory
     else move_victory
 
+check_possible_enemy_victory :: [[Char]] -> Char -> String -> Bool
+check_possible_enemy_victory board shape_enemy piece = do
+    let board_update = place_piece shape_enemy piece board
+    if (check_victory shape_enemy board_update) then True else False
+
+get_possible_enemy_victory :: [[Char]] -> Char -> String
+get_possible_enemy_victory board shape_enemy = do
+    let possible_piece_enemy_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_enemy_victory board shape_enemy (coord_to_cell (Coordinate x y))]
+    if possible_piece_enemy_victory /= [] then (head possible_piece_enemy_victory) else "XX"
+
+get_possible_place_victory :: [[Char]] -> Char -> String
+get_possible_place_victory board shape = do
+    let possible_place_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_enemy_victory board shape (coord_to_cell (Coordinate x y))]
+    if possible_place_victory /= [] then head possible_place_victory
+    else "XX"
+    
+get_possible_adjacent_piece_to_shape :: [[Char]] -> [String] -> String
+get_possible_adjacent_piece_to_shape board [] = "XX"
+get_possible_adjacent_piece_to_shape board pieces_shape = do
+    let piece = (head pieces_shape)
+    let adjacente_coordinates_piece = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', (coord_to_cell (Coordinate x y)) /= piece, (is_adjacent_move piece (coord_to_cell (Coordinate x y)))]
+    let adjacente_coordinates_to_place = [y | y <- adjacente_coordinates_piece, (board !! (row (cell_to_coord y)) !! (column (cell_to_coord y))) == '_']
+    if adjacente_coordinates_to_place /= [] then (head adjacente_coordinates_to_place) else get_possible_adjacent_piece_to_shape board (tail pieces_shape)
+
+get_best_place_computer :: [[Char]] -> Char -> Char -> String
+get_best_place_computer board shape_player shape_computer  = do
+    let pieces_player = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == shape_player]
+    let pieces_computer = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == shape_computer]
+    let possible_place = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_']
+    
+    let possible_piece_victory = get_possible_place_victory board shape_computer
+    if possible_piece_victory == "XX" then do
+        let possible_piece_enemy_victory = get_possible_enemy_victory board shape_player
+        if possible_piece_enemy_victory == "XX" then do
+            let possible_adjacent_place_to_player = get_possible_adjacent_piece_to_shape board pieces_player
+            if possible_adjacent_place_to_player == "XX" then do
+                let possible_adjacent_place_to_computer = get_possible_adjacent_piece_to_shape board pieces_computer
+                if possible_adjacent_place_to_computer == "XX" then (head possible_place) else possible_adjacent_place_to_computer
+            else possible_adjacent_place_to_player
+        else possible_piece_enemy_victory
+    else possible_piece_victory
+
 receive_placement board = do
   coord <- getLine
   if is_valid_placement coord board
@@ -200,21 +242,30 @@ receive_movement board shape = do
     putStrLn("\nPlease choose a valid coordinate for your movement.")
     receive_movement board shape
 
-placementRound 0  board player1 player2 shape1 shape2 = return board
-placementRound n board player1 player2 shape1 shape2 = do
+placementRound :: Int -> [[Char]] -> Player -> Player -> Char -> Char -> Bool -> IO [[Char]]
+placementRound 0  board player1 player2 shape1 shape2 is_player_computer = return board
+placementRound n board player1 player2 shape1 shape2 is_player_computer = do
   putStrLn("\n" ++ (playerName player1) ++ ", Please choose a coordinate to place your cell.")
   coord1 <- receive_placement board
   let board_plcm1 = (place_piece shape1 coord1 board)
   snapshot_board board_plcm1
   
   if not (check_victory shape1 board_plcm1) then do
-    putStrLn("\n" ++ (playerName player2) ++ ", Please choose a coordinate to place your cell.")
-    coord2 <- receive_placement board_plcm1
-    let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
-    snapshot_board board_plcm2
-    placementRound (n-1) board_plcm2 player1 player2 shape1 shape2
+    if is_player_computer then do
+        putStrLn("\nMovement of the computer.")
+        let coord_computer = get_best_place_computer board_plcm1 shape1 shape2
+        let board_plcm2 = (place_piece shape2 coord_computer board_plcm1)
+        snapshot_board board_plcm2
+        placementRound (n-1) board_plcm2 player1 player2 shape1 shape2 is_player_computer
+    else do
+        putStrLn("\n" ++ (playerName player2) ++ ", Please choose a coordinate to place your cell.")
+        coord2 <- receive_placement board_plcm1
+        let board_plcm2 = (place_piece shape2 coord2 board_plcm1)
+        snapshot_board board_plcm2
+        placementRound (n-1) board_plcm2 player1 player2 shape1 shape2 is_player_computer
   else return board_plcm1 
 
+movementRound :: [[Char]] -> Player -> Player -> Char -> Char -> Bool -> IO ()
 movementRound board player1 player2 shape1 shape2 is_player_computer = do
   putStrLn("\n" ++ (playerName player1) ++ ", Please choose a piece to be moved.")
   coord1_from <- receive_movement board shape1
@@ -305,7 +356,7 @@ main = do
             
             snapshot_board marel_board
 
-            board_past_placement <- placementRound 3 marel_board player1 player2 shape1 shape2
+            board_past_placement <- placementRound 3 marel_board player1 player2 shape1 shape2 False
             snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
@@ -320,7 +371,7 @@ main = do
             snapshot_board marel_board
             
             -- To do: implement place pieces for the computer
-            board_past_placement <- placementRound 3 marel_board player1 player_computer shape1 shape_computer
+            board_past_placement <- placementRound 3 marel_board player1 player_computer shape1 shape_computer True
             snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
