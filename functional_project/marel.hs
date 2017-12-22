@@ -340,7 +340,7 @@ main = do
         let marel_board  = [['_','_','_'],['_','_','_'],['_','_','_']]
         snapshot_board marel_board
 
-        putStr("\nPlayer one choose the name of your player: ")
+        putStrLn("\nPlayer one choose the name of your player: ")
         name <- getLine
         let player1 = Player name
         putStrLn("\n" ++ (playerName player1) ++ ", please choose the shape of your piece: ")
@@ -348,7 +348,7 @@ main = do
         getLine -- cleans buffer
         
         if option == "1" then do
-            putStr("\nPlayer two choose the name of your player: ")
+            putStrLn("\nPlayer two choose the name of your player: ")
             name <- getLine
             let player2 = Player name 
             putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece: ")
