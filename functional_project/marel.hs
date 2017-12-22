@@ -370,9 +370,7 @@ main = do
             let shape_computer = get_shape_computer shape1
             snapshot_board marel_board
             
-            -- To do: implement place pieces for the computer
             board_past_placement <- placementRound 3 marel_board player1 player_computer shape1 shape_computer True
-            snapshot_board board_past_placement
 
             if check_victory shape1 board_past_placement
                then putStrLn((playerName player1) ++ " has won!\n")
