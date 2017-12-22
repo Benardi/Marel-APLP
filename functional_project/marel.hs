@@ -41,8 +41,7 @@ welcoming_screen = do
     putStrLn("Option (1): play with a friend.")
     putStrLn("Option (2): play with the computer.")
     putStrLn("Option (anything): quit the game.")
-    putStrLn("")
-    putStr("Option is: ")
+    putStr("\nOption is: ")
     return()
 
 check_left_diagonal :: Char -> [[Char]] -> Bool
