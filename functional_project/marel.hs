@@ -262,6 +262,16 @@ movementRoundPlayerComputer board player1 player_computer shape1 shape_computer 
     putStrLn("\nThe computer player made his move.")
     movementRound board_mvm2 player1 player_computer shape1 shape_computer True
 
+selectShape2 player2 shape1 = do
+  shapeTwo <- getChar
+  getLine -- cleans buffer
+
+  if shapeTwo == shape1 then do
+    putStrLn("\n" ++ (playerName player2) ++ ", please choose a different shape of: " ++ [shape1])
+    selectShape2 player2 shape1
+  else do
+    return shapeTwo
+
 snapshot_board :: [[Char]] -> IO ()
 snapshot_board board = do
   putStrLn("\n    A  B  C")
@@ -291,8 +301,8 @@ main = do
             name <- getLine
             let player2 = Player name 
             putStrLn("\n" ++ (playerName player2) ++ ", please choose the shape of your piece.")
-            shape2 <- getChar
-            getLine -- cleans buffer
+            shape2 <- selectShape2 player2 shape1
+            
             snapshot_board marel_board
 
             board_past_placement <- placementRound 3 marel_board player1 player2 shape1 shape2
