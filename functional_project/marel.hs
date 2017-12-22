@@ -195,7 +195,10 @@ get_possible_enemy_victory board shape_enemy = do
     if possible_piece_enemy_victory /= [] then (head possible_piece_enemy_victory) else "XX"
 
 get_possible_place_victory :: [[Char]] -> Char -> String
-get_possible_place_victory board shape = "XX" --Missing implementation
+get_possible_place_victory board shape = do
+    let possible_place_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_enemy_victory board shape (coord_to_cell (Coordinate x y))]
+    if possible_place_victory /= [] then head possible_place_victory
+    else "XX"
     
 get_possible_adjacent_piece_to_shape :: [[Char]] -> [String] -> String
 get_possible_adjacent_piece_to_shape board [] = "XX"
