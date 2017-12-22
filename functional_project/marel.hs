@@ -184,19 +184,19 @@ get_best_move_computer board shape_player shape_computer possible_moves = do
         else move_enemy_victory
     else move_victory
 
-check_possible_enemy_victory :: [[Char]] -> Char -> String -> Bool
-check_possible_enemy_victory board shape_enemy piece = do
+check_possible_victory :: [[Char]] -> Char -> String -> Bool
+check_possible_victory board shape_enemy piece = do
     let board_update = place_piece shape_enemy piece board
     if (check_victory shape_enemy board_update) then True else False
 
 get_possible_enemy_victory :: [[Char]] -> Char -> String
 get_possible_enemy_victory board shape_enemy = do
-    let possible_piece_enemy_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_enemy_victory board shape_enemy (coord_to_cell (Coordinate x y))]
+    let possible_piece_enemy_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_victory board shape_enemy (coord_to_cell (Coordinate x y))]
     if possible_piece_enemy_victory /= [] then (head possible_piece_enemy_victory) else "XX"
 
 get_possible_place_victory :: [[Char]] -> Char -> String
 get_possible_place_victory board shape = do
-    let possible_place_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_enemy_victory board shape (coord_to_cell (Coordinate x y))]
+    let possible_place_victory = [coord_to_cell (Coordinate x y) | x <- [0..2], y <- [0..2], (board !! x !! y) == '_', check_possible_victory board shape (coord_to_cell (Coordinate x y))]
     if possible_place_victory /= [] then head possible_place_victory
     else "XX"
     
@@ -357,8 +357,7 @@ main = do
             snapshot_board marel_board
 
             board_past_placement <- placementRound 3 marel_board player1 player2 shape1 shape2 False
-            snapshot_board board_past_placement
-
+            
             if check_victory shape1 board_past_placement
                then putStrLn((playerName player1) ++ " has won!\n")
             else do
