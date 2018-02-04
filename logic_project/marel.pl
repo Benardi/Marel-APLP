@@ -90,18 +90,25 @@ is_valid_mvmnt(_shape,_org_row, _org_col,_des_row, _des_col,_board):-
   is_valid_origin(_shape,_org_row, _org_col,_board),
   is_valid_plcmnt(_des_row, _des_col, _board).
 
+place_piece(_row, _col,_shape, _board,R):-
+  alter_board(_row, _col,_shape, _board,R).
+
+move_piece(_org_row, _org_col,_des_row, _des_col,_board, R):-
+  get_board_pos(_org_row, _org_col, _board,_shape),
+  alter_board(_des_row, _des_col,_shape, _board,R1),
+  alter_board(_org_row, _org_col,'_', R1,R).
+
+
 :- initialization main.
 
 main :-
   _board = [['_','S','_'],['@','_','_'],['_','_','&']],
   snapshot_board(_board),
-  % get_board_pos(2,2,_board,R),
-  % nth0(0,_board,Line1),
-  % replace_line(Line1, 2, '@', R),
-  alter_board(2, 1, '%', _board,R),
-  alter_board(1, 1, '%', R,R1),
-  alter_board(0, 1, '%', R1,R2),
-  snapshot_board(R2),
-  (check_for_victory('%',R2) -> writeln('Winner');writeln('No Winner')),
-  (is_valid_mvmnt('%',0,1,2,2,R2) -> writeln('Valid');writeln('Invalid')),
+  place_piece(2, 1, '%', _board,R),
+  place_piece(1, 1, '%', R,R1),
+  place_piece(0, 1, '%', R1,R2),
+  move_piece(0, 1,0,2,R2, R3),
+  snapshot_board(R3),
+  (check_for_victory('%',R3) -> writeln('Winner');writeln('No Winner')),
+  (is_valid_mvmnt('%',0,1,2,2,R3) -> writeln('Valid');writeln('Invalid')),
   halt(0).
