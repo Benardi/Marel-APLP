@@ -31,7 +31,48 @@ alter_board(_row, _col,_shape, _board,R):-
                   create_list(_row1,List1,List2),create_list(_row0,List2,R));
    append([],[],R)).
 
+check_right_diagonal(_shape, _board):-
+  get_board_pos(0, 0, _board, R1),
+  get_board_pos(1, 1, _board, R2),
+  get_board_pos(2, 2, _board, R3),
+  R1 == _shape,R2 == _shape,R3 == _shape.
 
+check_left_diagonal(_shape, _board):-
+  get_board_pos(0, 2, _board, R1),
+  get_board_pos(1, 1, _board, R2),
+  get_board_pos(2, 0, _board, R3),
+  R1 == _shape,R2 == _shape,R3 == _shape.
+
+check_all_diagonals(_shape, _board):-
+  check_left_diagonal(_shape, _board);
+  check_right_diagonal(_shape, _board).
+
+check_column(_colum, _shape, _board):-
+  get_board_pos(0, _colum, _board, R1),
+  get_board_pos(1, _colum, _board, R2),
+  get_board_pos(2, _colum, _board, R3),
+  R1 == _shape,R2 == _shape,R3 == _shape.
+
+check_all_columns(_shape, _board):-
+  check_column(0, _shape, _board);
+  check_column(1, _shape, _board);
+  check_column(2, _shape, _board).
+
+check_row(_row, _shape, _board):-
+  get_board_pos(_row, 0, _board, R1),
+  get_board_pos(_row, 1, _board, R2),
+  get_board_pos(_row, 2, _board, R3),
+  R1 == _shape,R2 == _shape,R3 == _shape.
+
+check_all_rows(_shape, _board):-
+    check_row(0, _shape, _board);
+    check_row(1, _shape, _board);
+    check_row(2, _shape, _board).
+
+check_for_victory(_shape, _board):-
+  check_all_diagonals(_shape, _board);
+  check_all_columns(_shape, _board);
+  check_all_rows(_shape, _board).
 
 :- initialization main.
 
@@ -41,6 +82,9 @@ main :-
   % get_board_pos(2,2,_board,R),
   % nth0(0,_board,Line1),
   % replace_line(Line1, 2, '@', R),
-  alter_board(1, 1,'%', _board,R),
-  snapshot_board(R),
+  alter_board(2, 1, '%', _board,R),
+  alter_board(1, 1, '%', R,R1),
+  alter_board(0, 1, '%', R1,R2),
+  snapshot_board(R2),
+  (check_for_victory('%',R2) -> writeln('Winner');writeln('No Winner')),
   halt(0).
