@@ -74,6 +74,22 @@ check_for_victory(_shape, _board):-
   check_all_columns(_shape, _board);
   check_all_rows(_shape, _board).
 
+is_valid_plcmnt(_row, _col, _board):-
+  ( (_row > 2;_row < 0) -> false;
+    (_col > 2;_col < 0) -> false;
+     (get_board_pos(_row,_col,_board,R),
+      Y = '_', ($R == $Y) -> true; false) ).
+
+is_valid_origin(_shape,_row, _col,_board):-
+  ((_row > 2;_row < 0) -> false;
+   (_col > 2;_col < 0) -> false;
+     (get_board_pos(_row,_col,_board,R),
+      ($R == $_shape) -> true; false)).
+
+is_valid_mvmnt(_shape,_org_row, _org_col,_des_row, _des_col,_board):-
+  is_valid_origin(_shape,_org_row, _org_col,_board),
+  is_valid_plcmnt(_des_row, _des_col, _board).
+
 :- initialization main.
 
 main :-
@@ -87,4 +103,5 @@ main :-
   alter_board(0, 1, '%', R1,R2),
   snapshot_board(R2),
   (check_for_victory('%',R2) -> writeln('Winner');writeln('No Winner')),
+  (is_valid_mvmnt('%',0,1,2,2,R2) -> writeln('Valid');writeln('Invalid')),
   halt(0).
