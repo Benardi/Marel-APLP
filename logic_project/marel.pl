@@ -74,6 +74,22 @@ check_for_victory(_shape, _board):-
   check_all_columns(_shape, _board);
   check_all_rows(_shape, _board).
 
+pow(X,Y,Z) :- Z is X**Y.
+
+distance(_org_row, _org_col,_des_row, _des_col, R):-
+  X is (_des_col - _org_col),
+  Y is (_des_row - _org_row),
+  pow(X,2,X2),
+  pow(Y,2,Y2),
+  R2 is X2 + Y2,
+  R1 is sqrt(R2),
+  R is floor(R1).
+
+is_adjacent(_org_row, _org_col,_des_row, _des_col):-
+  distance(_org_row, _org_col,_des_row, _des_col, R),
+  R == 1.
+
+
 is_valid_plcmnt(_row, _col, _board):-
   ( (_row > 2;_row < 0) -> false;
     (_col > 2;_col < 0) -> false;
@@ -88,7 +104,8 @@ is_valid_origin(_shape,_row, _col,_board):-
 
 is_valid_mvmnt(_shape,_org_row, _org_col,_des_row, _des_col,_board):-
   is_valid_origin(_shape,_org_row, _org_col,_board),
-  is_valid_plcmnt(_des_row, _des_col, _board).
+  is_valid_plcmnt(_des_row, _des_col, _board),
+  is_adjacent(_org_row, _org_col,_des_row, _des_col).
 
 place_piece(_row, _col,_shape, _board,R):-
   alter_board(_row, _col,_shape, _board,R).
@@ -102,13 +119,13 @@ move_piece(_org_row, _org_col,_des_row, _des_col,_board, R):-
 :- initialization main.
 
 main :-
-  _board = [['_','S','_'],['@','_','_'],['_','_','&']],
+  _board = [['_','S','_'],['@','_','_'],['_','_','%']],
   snapshot_board(_board),
   place_piece(2, 1, '%', _board,R),
-  place_piece(1, 1, '%', R,R1),
+  place_piece(0, 1, '%', R,R1),
   place_piece(0, 1, '%', R1,R2),
   move_piece(0, 1,0,2,R2, R3),
   snapshot_board(R3),
   (check_for_victory('%',R3) -> writeln('Winner');writeln('No Winner')),
-  (is_valid_mvmnt('%',0,1,2,2,R3) -> writeln('Valid');writeln('Invalid')),
+  (is_valid_mvmnt('%',2,2,0,0,R3) -> writeln('Valid');writeln('Invalid')),
   halt(0).
