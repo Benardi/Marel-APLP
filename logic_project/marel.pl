@@ -98,6 +98,20 @@ move_piece(_org_row, _org_col,_des_row, _des_col,_board, R):-
   alter_board(_des_row, _des_col,_shape, _board,R1),
   alter_board(_org_row, _org_col,'_', R1,R).
 
+create_player(_name, _pieces, _shape, Player) :-
+  Player = [_name, _pieces, _shape].
+
+/**
+* player_info(_index, _player, _info) :- nth0(_index, _player, _info).
+* 
+* 0 - _name
+* 1 - _pieces
+* 2 - _shape 
+*/
+
+player_name([_name, _, _], _name).
+player_pieces([_, _pieces, _], _pieces).
+player_shape([_, _, _shape], _shape).
 
 :- initialization main.
 
@@ -111,4 +125,13 @@ main :-
   snapshot_board(R3),
   (check_for_victory('%',R3) -> writeln('Winner');writeln('No Winner')),
   (is_valid_mvmnt('%',0,1,2,2,R3) -> writeln('Valid');writeln('Invalid')),
-  halt(0).
+  /**Player 1*/
+  create_player('Lucas', [], 'O', X), 
+  player_name(X, _name1), writeln(_name1),
+  player_pieces(X, _pieces1), writeln(_pieces1),
+  player_shape(X, _shape1), writeln(_shape1),
+  /**Player 2*/
+  create_player('Carlos', [], 'Z', Y),
+  player_name(Y, _name2), writeln(_name2),
+  player_pieces(Y, _pieces2), writeln(_pieces2),
+  player_shape(Y, _shape2), writeln(_shape2).
