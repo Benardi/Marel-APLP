@@ -134,4 +134,5 @@ main :-
   create_player('Carlos', [], 'Z', Y),
   player_name(Y, _name2), writeln(_name2),
   player_pieces(Y, _pieces2), writeln(_pieces2),
-  player_shape(Y, _shape2), writeln(_shape2).
+  player_shape(Y, _shape2), writeln(_shape2),
+  halt(0).
