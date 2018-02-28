@@ -1,3 +1,25 @@
+cell_to_coord('A1', 0, 0).
+cell_to_coord('A2', 1, 0).
+cell_to_coord('A3', 2, 0).
+cell_to_coord('B1', 0, 1).
+cell_to_coord('B2', 1, 1).
+cell_to_coord('B3', 2, 1).
+cell_to_coord('C1', 0, 2).
+cell_to_coord('C2', 1, 2).
+cell_to_coord('C3', 2, 2).
+cell_to_coord(_, -1, -1).
+
+coord_to_cell(0, 0, 'A1').
+coord_to_cell(1, 0, 'A2').
+coord_to_cell(2, 0, 'A3').
+coord_to_cell(0, 1, 'B1').
+coord_to_cell(1, 1, 'B2').
+coord_to_cell(2, 1, 'B3').
+coord_to_cell(0, 2, 'C1').
+coord_to_cell(1, 2, 'C2').
+coord_to_cell(2, 2, 'C3').
+coord_to_cell(_, _, 'XX').
+
 snapshot_board(_board) :-
   writeln("\n     A  B  C"),
   nth0(0,_board,Line1),nth0(1,_board,Line2),nth0(2,_board,Line3),
@@ -89,7 +111,6 @@ is_adjacent(_org_row, _org_col,_des_row, _des_col):-
   distance(_org_row, _org_col,_des_row, _des_col, R),
   R == 1.
 
-
 is_valid_plcmnt(_row, _col, _board):-
   ( (_row > 2;_row < 0) -> false;
     (_col > 2;_col < 0) -> false;
@@ -152,4 +173,10 @@ main :-
   player_name(Y, _name2), writeln(_name2),
   player_pieces(Y, _pieces2), writeln(_pieces2),
   player_shape(Y, _shape2), writeln(_shape2),
+  /**Create coordinates*/
+  read_line_to_codes(user_input, E2),
+  string_to_atom(E2, E1),
+  upcase_atom(E1, E), /**Always use upcase_atom(atom, result) for coordinates*/
+  cell_to_coord(E, _row, _col), writeln("row ": _row), writeln("col ": _col),
+  coord_to_cell(_row, _col, _cell), writeln("cell ": _cell),
   halt(0).
