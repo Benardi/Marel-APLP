@@ -139,6 +139,18 @@ move_piece(_org_row, _org_col,_des_row, _des_col,_board, R):-
 create_player(_name, _pieces, _shape, Player) :-
   Player = [_name, _pieces, _shape].
 
+create_player_human(_pieces, Type, Player) :-
+  atom_concat("\nPlayer ", Type, R1),
+  atom_concat(R1, " choose the name of your player:", R2),
+  writeln(R2),
+  read_line_to_codes(user_input, T1),
+  string_to_atom(T1, _name),
+  atom_concat(R1, " choose the shape of your piece:", R3),
+  writeln(R3),
+  read_line_to_codes(user_input, T2),
+  string_to_atom(T2, _shape),
+  create_player(_name, _pieces, _shape, Player).
+
 /**
 * player_info(_index, _player, _info) :- nth0(_index, _player, _info).
 *
@@ -151,32 +163,41 @@ player_name([_name, _, _], _name).
 player_pieces([_, _pieces, _], _pieces).
 player_shape([_, _, _shape], _shape).
 
+welcome_screen() :-
+  writeln("\t################################################################"),
+  writeln("\t#                MAREL - GAME OF THE THREE TRAILS              #"),
+  writeln("\t#                   Play and have lots of fun                  #"),
+  writeln("\t#                                                              #"),
+  writeln("\t################################################################"),
+  writeln("\nChoose an option:"),
+  writeln("Option (1): play with a friend."),
+  writeln("Option (2): play with the computer."),
+  writeln("Option (anything): quit the game."),
+  writeln("\nOption is: "), nl.
+
 :- initialization main.
 
 main :-
-  _board = [['_','S','_'],['@','_','_'],['_','_','%']],
+  _board = [['_','_','_'],['_','_','_'],['_','_','_']],
   snapshot_board(_board),
-  place_piece(2, 1, '%', _board,R),
-  place_piece(0, 1, '%', R,R1),
-  place_piece(0, 1, '%', R1,R2),
-  move_piece(0, 1,0,2,R2, R3),
-  snapshot_board(R3),
-  (check_for_victory('%',R3) -> writeln('Winner');writeln('No Winner')),
-  (is_valid_mvmnt('%',0,1,2,2,R3) -> writeln('Valid');writeln('Invalid')),
-  /**Player 1*/
-  create_player('Lucas', [], 'O', X),
-  player_name(X, _name1), writeln(_name1),
-  player_pieces(X, _pieces1), writeln(_pieces1),
-  player_shape(X, _shape1), writeln(_shape1),
-  /**Player 2*/
-  create_player('Carlos', [], 'Z', Y),
-  player_name(Y, _name2), writeln(_name2),
-  player_pieces(Y, _pieces2), writeln(_pieces2),
-  player_shape(Y, _shape2), writeln(_shape2),
-  /**Create coordinates*/
-  read_line_to_codes(user_input, E2),
-  string_to_atom(E2, E1),
-  upcase_atom(E1, E), /**Always use upcase_atom(atom, result) for coordinates*/
-  cell_to_coord(E, _row, _col), writeln("row ": _row), writeln("col ": _col),
-  coord_to_cell(_row, _col, _cell), writeln("cell ": _cell),
+  /** Menu and options*/
+  welcome_screen(),
+  read_line_to_codes(user_input, T1),
+  string_to_atom(T1, OP),
+  /** Creating players according to the options or quit the game*/
+  ((OP == '1', create_player_human([], 'one', P1), create_player_human([], 'two', P2));
+  (OP == '2', create_player_human([], 'one', P1), create_player('Computer', [], 'X', P2));
+  (halt(0))),
+  player_name(P1, N1),
+  atom_concat('Welcome player ', N1, R1),
+  player_name(P2, N2),
+  atom_concat('Welcome player ', N2, R2),
+  player_shape(P1, S1),
+  atom_concat(R1, ' your shape is ', R3),
+  atom_concat(R3, S1, RF1),
+  player_shape(P2, S2),
+  atom_concat(R2, ' your shape is ', R4),
+  atom_concat(R4, S2, RF2),
+  writeln(RF1),
+  writeln(RF2),
   halt(0).
