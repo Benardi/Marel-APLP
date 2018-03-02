@@ -173,7 +173,7 @@ welcome_screen() :-
   writeln("Option (1): play with a friend."),
   writeln("Option (2): play with the computer."),
   writeln("Option (anything): quit the game."),
-  writeln("\nOption is: "), nl.  
+  writeln("\nOption is: "), nl.
 
 :- initialization main.
 
@@ -193,35 +193,11 @@ main :-
   player_name(P2, N2),
   atom_concat('Welcome player ', N2, R2),
   player_shape(P1, S1),
-  atom_concat(R1, ' you shape is ', R3),
+  atom_concat(R1, ' your shape is ', R3),
   atom_concat(R3, S1, RF1),
   player_shape(P2, S2),
-  atom_concat(R2, ' you shape is ', R4),
+  atom_concat(R2, ' your shape is ', R4),
   atom_concat(R4, S2, RF2),
   writeln(RF1),
   writeln(RF2),
-  /**place_piece(2, 1, '%', _board,R),
-  *place_piece(0, 1, '%', R,R1),
-  *place_piece(0, 1, '%', R1,R2),
-  *move_piece(0, 1,0,2,R2, R3),
-  *snapshot_board(R3),
-  *(check_for_victory('%',R3) -> writeln('Winner');writeln('No Winner')),
-  *(is_valid_mvmnt('%',0,1,2,2,R3) -> writeln('Valid');writeln('Invalid')),
-  *(-Player 1-)
-  *create_player('Lucas', [], 'O', X),
-  *player_name(X, _name1), writeln(_name1),
-  *player_pieces(X, _pieces1), writeln(_pieces1),
-  *player_shape(X, _shape1), writeln(_shape1),
-  *(-Player 2-)
-  *create_player('Carlos', [], 'Z', Y),
-  *player_name(Y, _name2), writeln(_name2),
-  *player_pieces(Y, _pieces2), writeln(_pieces2),
-  *player_shape(Y, _shape2), writeln(_shape2),
-  *(-Create coordinates-)
-  *read_line_to_codes(user_input, E2),
-  *string_to_atom(E2, E1),
-  *upcase_atom(E1, E), (-Always use upcase_atom(atom, result) for coordinates-)
-  *cell_to_coord(E, _row, _col), writeln("row ": _row), writeln("col ": _col),
-  *coord_to_cell(_row, _col, _cell), writeln("cell ": _cell),
-  */
   halt(0).
