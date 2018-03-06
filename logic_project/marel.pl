@@ -179,6 +179,11 @@ create_player_human(_pieces, Type, Player) :-
   writeln(R7),
   create_player(_name, _pieces, _shape, Player).
 
+create_player_computer(Player_one, Player) :-
+  nth0(2,Player_one,_shape),
+  (_shape \== 'X' -> (create_player('computer', [], 'X', Player)));
+  (create_player('computer', [], 'O', Player)).
+
 receive_placement(_board, _row, _col) :- 
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, C1),
@@ -249,7 +254,7 @@ main :-
   string_to_atom(T1, OP),
   /** Creating players according to the options or quit the game*/
   ((OP == '1', create_player_human([], 'one', P1), create_player_two_human([], P1, P2));
-  (OP == '2', create_player_human([], 'one', P1), create_player('Computer', [], 'X', P2));
+  (OP == '2', create_player_human([], 'one', P1), create_player_computer(P1, P2));
   (halt(0))),
   writeln('\n-- The first phase ---'),
   snapshot_board(_board),
