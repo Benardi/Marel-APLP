@@ -139,6 +139,30 @@ move_piece(_org_row, _org_col,_des_row, _des_col,_board, R):-
 create_player(_name, _pieces, _shape, Player) :-
   Player = [_name, _pieces, _shape].
 
+select_shape(Shape_one, Player_name, Shape) :-
+  atom_concat(Player_name, " choose the shape of your piece:", R1),
+  writeln(R1),
+  read_line_to_codes(user_input, T1),
+  string_to_atom(T1, _shape),
+  (Shape_one \== _shape -> (Shape = _shape));
+  (atom_concat(Player_name,', please choose a different shape', R2),
+    writeln(R2), select_shape(Shape_one, Player_name, Shape)).
+
+select_name(Name_one, Name) :-
+  writeln("\nPlayer two choose the name of your player:"),
+  read_line_to_codes(user_input, T1),
+  string_to_atom(T1, _name),
+  (Name_one \== _name -> (Name = _name));
+  (writeln("\nPlayer two, please choose a different Name"),
+    select_name(Name_one, Name)).
+
+create_player_two_human(_pieces, Player_one, Player) :-
+  nth0(0, Player_one, _name),
+  nth0(2, Player_one, _shape),
+  select_name(_name, Name),
+  select_shape(_shape, Name, Shape),
+  create_player(Name, _pieces, Shape, Player).
+
 create_player_human(_pieces, Type, Player) :-
   atom_concat("\nPlayer ", Type, R1),
   atom_concat(R1, " choose the name of your player:", R2),
@@ -164,7 +188,9 @@ receive_placement(_board, _row, _col) :-
 
 first_phase(P1, P2, _board, 0, R) :- R = _board. 
 first_phase(P1, P2, _board, _rodada, R) :-
-  writeln('\nPlayer one, please choose a coordinate to place your cell:'),
+  nth0(0, P1, _name_one),
+  atom_concat(_name_one, ', please choose a coordinate to place your cell:', _one),
+  writeln(_one),
   receive_placement(_board, _row_1, _col_1),
   player_shape(P1, _shape_1),
   place_piece(_row_1, _col_1, _shape_1, _board, _board_new),
@@ -173,7 +199,9 @@ first_phase(P1, P2, _board, _rodada, R) :-
   (player_name(P2, N2),
   _rodada_new is (_rodada - 1),
   ((N2 \= 'Computer') ->
-  (writeln('\nPlayer two, please choose a coordinate to place your cell:'),
+  (nth0(0, P2, _name_two),
+    atom_concat(_name_two, ', please choose a coordinate to place your cell:', _two),
+    writeln(_two),
   receive_placement(_board_new, _row_2, _col_2),
   player_shape(P2, _shape_2),
   place_piece(_row_2, _col_2, _shape_2, _board_new, _board_new_2),
@@ -220,7 +248,7 @@ main :-
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, OP),
   /** Creating players according to the options or quit the game*/
-  ((OP == '1', create_player_human([], 'one', P1), create_player_human([], 'two', P2));
+  ((OP == '1', create_player_human([], 'one', P1), create_player_two_human([], P1, P2));
   (OP == '2', create_player_human([], 'one', P1), create_player('Computer', [], 'X', P2));
   (halt(0))),
   writeln('\n-- The first phase ---'),
