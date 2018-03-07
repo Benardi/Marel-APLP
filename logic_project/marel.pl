@@ -161,7 +161,7 @@ select_name(Name_one, Name) :-
   writeln("\nPlayer two choose the name of your player:"),
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, _name),
-  (Name_one \== _name -> (Name = _name));
+  ((Name_one \== _name, _name \== 'Computer') -> (Name = _name));
   (writeln("\nPlayer two, please choose a different Name"),
     select_name(Name_one, Name)).
 
@@ -193,8 +193,8 @@ create_player_one_human(_pieces, Player) :-
 
 create_player_computer(Player_one, Player) :-
   nth0(2,Player_one,_shape),
-  (_shape \== 'X' -> (create_player('computer', [], 'X', Player)));
-  (create_player('computer', [], 'O', Player)).
+  (_shape \== 'X' -> (create_player('Computer', [], 'X', Player)));
+  (create_player('Computer', [], 'O', Player)).
 
 receive_placement(_board, _row, _col) :- 
   read_line_to_codes(user_input, T1),
