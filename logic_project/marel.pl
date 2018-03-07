@@ -161,7 +161,7 @@ select_name(Name_one, Name) :-
   writeln("\nPlayer two choose the name of your player:"),
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, _name),
-  (Name_one \== _name -> (Name = _name));
+  ((Name_one \== _name, _name \== 'Computer') -> (Name = _name));
   (writeln("\nPlayer two, please choose a different Name"),
     select_name(Name_one, Name)).
 
@@ -170,16 +170,19 @@ create_player_two_human(_pieces, Player_one, Player) :-
   nth0(2, Player_one, _shape),
   select_name(_name, Name),
   select_shape(_shape, Name, Shape),
+  atom_concat('\nWelcome player ', Name, R5),
+  atom_concat(R5, ' your shape is ', R6),
+  atom_concat(R6, Shape, R7),
+  writeln(R7),
   create_player(Name, _pieces, Shape, Player).
 
-create_player_human(_pieces, Type, Player) :-
-  atom_concat("\nPlayer ", Type, R1),
-  atom_concat(R1, " choose the name of your player:", R2),
-  writeln(R2),
+create_player_one_human(_pieces, Player) :-
+  writeln("\nPlayer one choose the name of your player:"),
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, _name),
-  atom_concat(R1, " choose the shape of your piece:", R3),
-  writeln(R3),
+  atom_concat("\nPlayer ", _name, R1),
+  atom_concat(R1, " choose the shape of your piece:", R2),
+  writeln(R2),
   read_line_to_codes(user_input, T2),
   string_to_atom(T2, _shape),
   atom_concat('\nWelcome player ', _name, R5),
@@ -190,17 +193,17 @@ create_player_human(_pieces, Type, Player) :-
 
 create_player_computer(Player_one, Player) :-
   nth0(2,Player_one,_shape),
-  (_shape \== 'X' -> (create_player('computer', [], 'X', Player)));
-  (create_player('computer', [], 'O', Player)).
+  (_shape \== 'X' -> (create_player('Computer', [], 'X', Player)));
+  (create_player('Computer', [], 'O', Player)).
 
 receive_placement(_board, _row, _col) :- 
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, C1),
   cell_to_coord(C1, _row_1, _col_1),
   (is_valid_plcmnt(_row_1, _col_1, _board) -> (_row = _row_1, _col = _col_1);
-  (writeln('\nPlease choose a valid coordinate for your movement:'), receive_placement(_board, _row, _col))). 
+  (writeln('\nPlease choose a valid coordinate for your placement:'), receive_placement(_board, _row, _col))). 
 
-first_phase(P1, P2, _board, 0, R) :- R = _board. 
+first_phase(_, _, _board, 0, R) :- R = _board. 
 first_phase(P1, P2, _board, _rodada, R) :-
   nth0(0, P1, _name_one),
   atom_concat(_name_one, ', please choose a coordinate to place your cell:', _one),
@@ -223,6 +226,39 @@ first_phase(P1, P2, _board, _rodada, R) :-
   first_phase(P1, P2, _board_new_2, _rodada_new, R));
   (writeln('\nMovement of the computer.(Needs implementation)'),
   first_phase(P1, P2, _board_new, _rodada_new, R))))).
+
+receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :- 
+  nth0(0, _player, _name_player),
+  atom_concat(_name_player, ', please choose a piece to be moved:', _one), 
+  writeln(_one),
+  read_line_to_codes(user_input, T1),
+  string_to_atom(T1, C1),
+  atom_concat(_name_player, ', please choose to where it should be moved:', _two),
+  writeln(_two),
+  read_line_to_codes(user_input, T2),
+  string_to_atom(T2, C2),
+  cell_to_coord(C1, _row_temp_ori, _col_temp_ori),
+  cell_to_coord(C2, _row_temp_from, _col_temp_from),
+  player_shape(_player, _shape_player),
+  (is_valid_mvmnt(_shape_player, _row_temp_ori, _col_temp_ori, _row_temp_from, _col_temp_from, _board) -> (_row_ori = _row_temp_ori, _col_ori = _col_temp_ori, _row_from = _row_temp_from, _col_from = _col_temp_from);
+  (writeln('\nPlease choose a valid movement!'), receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from))).
+
+second_phase(P1, P2, _board) :-
+  receive_movement(_board, P1, _row_ori_1, _col_ori_1, _row_from_1, _col_from_1),
+  move_piece(_row_ori_1, _col_ori_1, _row_from_1, _col_from_1, _board, _board_new),
+  snapshot_board(_board_new),
+  player_shape(P1, _shape_1),
+  (check_for_victory(_shape_1, _board_new) -> (victory_message(P1, _message), writeln(_message));
+  (player_name(P2, N2),
+  ((N2 \= 'Computer') ->
+  (receive_movement(_board_new, P2, _row_ori_2, _col_ori_2, _row_from_2, _col_from_2),
+  move_piece(_row_ori_2, _col_ori_2, _row_from_2, _col_from_2, _board_new, _board_new_2),
+  snapshot_board(_board_new_2),
+  player_shape(P2, _shape_2),
+  (check_for_victory(_shape_2, _board_new_2) -> (victory_message(P2, _message_2), writeln(_message_2));
+  second_phase(P1, P2, _board_new_2)));
+  (writeln('\nMovement of the computer.(Needs implementation)'),
+  second_phase(P1, P2, _board_new))))).  
 
 victory_message(_player, _message) :-
   player_name(_player, _name), 
@@ -262,8 +298,8 @@ main :-
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, OP),
   /** Creating players according to the options or quit the game*/
-  ((OP == '1', create_player_human([], 'one', P1), create_player_two_human([], P1, P2));
-  (OP == '2', create_player_human([], 'one', P1), create_player_computer(P1, P2));
+  ((OP == '1', create_player_one_human([], P1), create_player_two_human([], P1, P2));
+  (OP == '2', create_player_one_human([], P1), create_player_computer(P1, P2));
   (halt(0))),
   writeln('\n-- The first phase ---'),
   snapshot_board(_board),
@@ -272,5 +308,7 @@ main :-
   player_shape(P2, _shape_2),
   ((check_for_victory(_shape_1, _board_new), victory_message(P1, _message), writeln(_message));
   (check_for_victory(_shape_2, _board_new), victory_message(P2, _message), writeln(_message));
-  (writeln('\n-- The second phase ---(Needs implementation)'))),
+  (writeln('\n-- The second phase ---'),
+  snapshot_board(_board_new),
+  second_phase(P1, P2, _board_new))),
   halt(0).
