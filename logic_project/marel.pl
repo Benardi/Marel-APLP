@@ -59,6 +59,19 @@ check_right_diagonal(_shape, _board):-
   get_board_pos(2, 2, _board, R3),
   R1 == _shape,R2 == _shape,R3 == _shape.
 
+computer_move(_shape, _board, _board_new):-
+  (is_valid_plcmnt(0, 0, _board) -> place_piece(0, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(0, 1, _board) -> place_piece(0, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(0, 2, _board) -> place_piece(0, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 0, _board) -> place_piece(1, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 1, _board) -> place_piece(1, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 2, _board) -> place_piece(1, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 0, _board) -> place_piece(2, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 1, _board) -> place_piece(2, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 2, _board) -> place_piece(2, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 2, _board) -> place_piece(1, 2, _shape, _board, _board_new)).
+
+
 check_left_diagonal(_shape, _board):-
   get_board_pos(0, 2, _board, R1),
   get_board_pos(1, 1, _board, R2),
@@ -258,7 +271,9 @@ main :-
   (halt(0))),
   writeln('\n-- The first phase ---'),
   snapshot_board(_board),
-  first_phase(P1, P2, _board, 3, _board_new),
+  %% teste
+  %% computer_move('V', _board, _board_1),
+  first_phase(P1, P2, _board_1, 3, _board_new),
   player_shape(P1, _shape_1),
   player_shape(P2, _shape_2),
   ((check_for_victory(_shape_1, _board_new), victory_message(P1, _message), writeln(_message));
