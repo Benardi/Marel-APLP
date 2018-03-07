@@ -170,16 +170,17 @@ create_player_two_human(_pieces, Player_one, Player) :-
   nth0(2, Player_one, _shape),
   select_name(_name, Name),
   select_shape(_shape, Name, Shape),
+  atom_concat('\nWelcome player ', Name, R5),
+  atom_concat(R5, ' your shape is ', R6),
+  atom_concat(R6, Shape, R7),
+  writeln(R7),
   create_player(Name, _pieces, Shape, Player).
 
-create_player_human(_pieces, Type, Player) :-
-  atom_concat("\nPlayer ", Type, R1),
-  atom_concat(R1, " choose the name of your player:", R2),
-  writeln(R2),
+create_player_one_human(_pieces, Player) :-
+  writeln("\nPlayer one choose the name of your player:"),
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, _name),
-  atom_concat(R1, " choose the shape of your piece:", R3),
-  writeln(R3),
+  writeln("\nPlayer two, please choose a different Name"),
   read_line_to_codes(user_input, T2),
   string_to_atom(T2, _shape),
   atom_concat('\nWelcome player ', _name, R5),
@@ -262,8 +263,8 @@ main :-
   read_line_to_codes(user_input, T1),
   string_to_atom(T1, OP),
   /** Creating players according to the options or quit the game*/
-  ((OP == '1', create_player_human([], 'one', P1), create_player_two_human([], P1, P2));
-  (OP == '2', create_player_human([], 'one', P1), create_player_computer(P1, P2));
+  ((OP == '1', create_player_one_human([], P1), create_player_two_human([], P1, P2));
+  (OP == '2', create_player_one_human([], P1), create_player_computer(P1, P2));
   (halt(0))),
   writeln('\n-- The first phase ---'),
   snapshot_board(_board),
