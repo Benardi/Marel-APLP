@@ -7,6 +7,15 @@ cell_to_coord('B3', 2, 1).
 cell_to_coord('C1', 0, 2).
 cell_to_coord('C2', 1, 2).
 cell_to_coord('C3', 2, 2).
+cell_to_coord('a1', 0, 0).
+cell_to_coord('a2', 1, 0).
+cell_to_coord('a3', 2, 0).
+cell_to_coord('b1', 0, 1).
+cell_to_coord('b2', 1, 1).
+cell_to_coord('b3', 2, 1).
+cell_to_coord('c1', 0, 2).
+cell_to_coord('c2', 1, 2).
+cell_to_coord('c3', 2, 2).
 cell_to_coord(_, -1, -1).
 
 coord_to_cell(0, 0, 'A1').
