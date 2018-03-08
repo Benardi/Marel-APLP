@@ -201,7 +201,7 @@ receive_placement(_board, _row, _col) :-
   string_to_atom(T1, C1),
   cell_to_coord(C1, _row_1, _col_1),
   (is_valid_plcmnt(_row_1, _col_1, _board) -> (_row = _row_1, _col = _col_1);
-  (writeln('\nPlease choose a valid coordinate for your placement:'), receive_placement(_board, _row, _col))). 
+  (snapshot_board(_board), writeln('\nPlease choose a valid coordinate for your placement:'), receive_placement(_board, _row, _col))). 
 
 first_phase(_, _, _board, 0, R) :- R = _board. 
 first_phase(P1, P2, _board, _rodada, R) :-
@@ -241,7 +241,7 @@ receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :-
   cell_to_coord(C2, _row_temp_from, _col_temp_from),
   player_shape(_player, _shape_player),
   (is_valid_mvmnt(_shape_player, _row_temp_ori, _col_temp_ori, _row_temp_from, _col_temp_from, _board) -> (_row_ori = _row_temp_ori, _col_ori = _col_temp_ori, _row_from = _row_temp_from, _col_from = _col_temp_from);
-  (writeln('\nPlease choose a valid movement!'), receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from))).
+  (writeln('\nPlease choose a valid movement!'), snapshot_board(_board), receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from))).
 
 second_phase(P1, P2, _board) :-
   receive_movement(_board, P1, _row_ori_1, _col_ori_1, _row_from_1, _col_from_1),
