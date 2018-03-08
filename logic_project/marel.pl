@@ -256,6 +256,80 @@ receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :-
   (is_valid_mvmnt(_shape_player, _row_temp_ori, _col_temp_ori, _row_temp_from, _col_temp_from, _board) -> (_row_ori = _row_temp_ori, _col_ori = _col_temp_ori, _row_from = _row_temp_from, _col_from = _col_temp_from);
   (writeln('\nPlease choose a valid movement!'), snapshot_board(_board), receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from))).
 
+get_shapes_of_player(_board, _shape, Shapes) :-
+  append([],[], LST),
+  get_board_pos(0, 0, _board, R),
+  ((_shape == R) -> create_list([0,0], LST, LST1); LST1 = LST),
+  get_board_pos(0, 1, _board, R2),
+  ((_shape == R2) -> create_list([0,1], LST1, LST2); LST2 = LST1),
+  get_board_pos(0, 2, _board, R3),
+  ((_shape == R3) -> create_list([0,2], LST2, LST3); LST3 = LST2),
+  get_board_pos(1, 0, _board, R4),
+  ((_shape == R4) -> create_list([1,0], LST3, LST4); LST4 = LST3),
+  get_board_pos(1, 1, _board, R5),
+  ((_shape == R5) -> create_list([1,1], LST4, LST5); LST5 = LST4),
+  get_board_pos(1, 2, _board, R6),
+  ((_shape == R6) -> create_list([1,2], LST5, LST6); LST6 = LST5),
+  get_board_pos(2, 0, _board, R7),
+  ((_shape == R7) -> create_list([2,0], LST6, LST7); LST7 = LST6),
+  get_board_pos(2, 1, _board, R8),
+  ((_shape == R8) -> create_list([2,1], LST7, LST8); LST8 = LST7),
+  get_board_pos(2, 2, _board, R9),
+  ((_shape == R9) -> create_list([2,2], LST8, LST9); LST9 = LST8),
+  Shapes = LST9.
+
+get_movement(_board, _positon, _row_ori, _col_ori, _row_from, _col_from) :-
+  nth0(0, _positon, _row_ori),
+  nth0(1, _positon, _col_ori),
+  ROW is -1, COL is -1,
+  _row_aux is (_row_ori + 1), _col_aux is (_col_ori),
+  (is_valid_plcmnt(_row_aux, _col_aux, _board) -> (ROW1 = _row_aux, COL1 = _col_aux); 
+  ROW1 = ROW, COL1 = COL),
+  _row_aux1 is (_row_ori), _col_aux1 is (_col_ori + 1),
+  (is_valid_plcmnt(_row_aux1, _col_aux1, _board) -> (ROW2 = _row_aux1, COL2 = _col_aux1); 
+  ROW2 = ROW1, COL2 = COL1),
+  _row_aux2 is (_row_ori + 1), _col_aux2 is (_col_ori + 1),
+  (is_valid_plcmnt(_row_aux2, _col_aux2, _board) -> (ROW3 = _row_aux2, COL3 = _col_aux2); 
+  ROW3 = ROW2, COL3 = COL2),
+  _row_aux3 is (_row_ori), _col_aux3 is (_col_ori - 1),
+  (is_valid_plcmnt(_row_aux3, _col_aux3, _board) -> (ROW4 = _row_aux3, COL4 = _col_aux3); 
+  ROW4 = ROW3, COL4 = COL3),
+  _row_aux4 is (_row_ori - 1), _col_aux4 is (_col_ori),
+  (is_valid_plcmnt(_row_aux4, _col_aux4, _board) -> (ROW5 = _row_aux4, COL5 = _col_aux4); 
+  ROW5 = ROW4, COL5 = COL4),
+  _row_aux5 is (_row_ori - 1), _col_aux5 is (_col_ori - 1),
+  (is_valid_plcmnt(_row_aux5, _col_aux5, _board) -> (ROW6 = _row_aux5, COL6 = _col_aux5); 
+  ROW6 = ROW5, COL6 = COL5),
+  _row_aux6 is (_row_ori - 1), _col_aux6 is (_col_ori + 1),
+  (is_valid_plcmnt(_row_aux6, _col_aux6, _board) -> (ROW7 = _row_aux6, COL7 = _col_aux6); 
+  ROW7 = ROW6, COL7 = COL6),
+  _row_aux7 is (_row_ori + 1), _col_aux7 is (_col_ori - 1),
+  (is_valid_plcmnt(_row_aux7, _col_aux7, _board) -> (ROW8 = _row_aux7, COL8 = _col_aux7); 
+  ROW8 = ROW7, COL8 = COL7),
+  _row_from = ROW8, _col_from = COL8.
+
+movement_computer(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :-
+  player_shape(_player, Shape),
+  get_shapes_of_player(_board, Shape, Shapes),
+  nth0(0, Shapes, _pos_shape1),
+  nth0(1, Shapes, _pos_shape2),
+  nth0(2, Shapes, _pos_shape3),
+  _row_ori_aux is -1, _col_ori_aux is - 1, _row_from_aux is - 1, _col_from_aux is -1,
+  get_movement(_board, _pos_shape1, _row_ori1, _col_ori1, _row_from1, _col_from1),
+  get_movement(_board, _pos_shape2, _row_ori2, _col_ori2, _row_from2, _col_from2),
+  get_movement(_board, _pos_shape3, _row_ori3, _col_ori3, _row_from3, _col_from3),
+  ((_row_from1 >= 0) -> (_row_ori_aux1 = _row_ori1, _col_ori_aux1 = _col_ori1, 
+  _row_from_aux1 = _row_from1, _col_from_aux1 = _col_from1); _row_ori_aux1 = _row_ori_aux, 
+  _col_ori_aux1 = _col_ori_aux,_row_from_aux1 = _row_from_aux, _col_from_aux1 = _col_from_aux),
+  ((_row_from2 >= 0) -> (_row_ori_aux2 = _row_ori2, _col_ori_aux2 = _col_ori2, 
+  _row_from_aux2 = _row_from2, _col_from_aux2 = _col_from2); _row_ori_aux2 = _row_ori_aux1, 
+  _col_ori_aux2 = _col_ori_aux1, _row_from_aux2 = _row_from_aux1, _col_from_aux2 = _col_from_aux1),
+  ((_row_from3 >= 0) -> (_row_ori_aux3 = _row_ori3, _col_ori_aux3 = _col_ori3, 
+  _row_from_aux3 = _row_from3, _col_from_aux3 = _col_from3); _row_ori_aux3 = _row_ori_aux2, 
+  _col_ori_aux3 = _col_ori_aux2, _row_from_aux3 = _row_from_aux2, _col_from_aux3 = _col_from_aux2),
+  _col_ori = _col_ori_aux3, _row_ori = _row_ori_aux3, 
+  _col_from = _col_from_aux3, _row_from = _row_from_aux3.
+
 second_phase(P1, P2, _board) :-
   receive_movement(_board, P1, _row_ori_1, _col_ori_1, _row_from_1, _col_from_1),
   move_piece(_row_ori_1, _col_ori_1, _row_from_1, _col_from_1, _board, _board_new),
@@ -270,8 +344,13 @@ second_phase(P1, P2, _board) :-
   player_shape(P2, _shape_2),
   (check_for_victory(_shape_2, _board_new_2) -> (victory_message(P2, _message_2), writeln(_message_2));
   second_phase(P1, P2, _board_new_2)));
-  (writeln('\nMovement of the computer.(Needs implementation)'),
-  second_phase(P1, P2, _board_new))))).  
+  (writeln('---Movement of computer---'),
+  movement_computer(_board_new, P2, _row_ori_2, _col_ori_2, _row_from_2, _col_from_2),
+  move_piece(_row_ori_2, _col_ori_2, _row_from_2, _col_from_2, _board_new, _board_new_2),
+  snapshot_board(_board_new_2),
+  player_shape(P2, _shape_2),
+  (check_for_victory(_shape_2, _board_new_2) -> (victory_message(P2, _message_2), writeln(_message_2));
+  second_phase(P1, P2, _board_new_2)))))).
 
 victory_message(_player, _message) :-
   player_name(_player, _name), 
