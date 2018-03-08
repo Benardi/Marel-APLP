@@ -68,6 +68,19 @@ check_right_diagonal(_shape, _board):-
   get_board_pos(2, 2, _board, R3),
   R1 == _shape,R2 == _shape,R3 == _shape.
 
+computer_move(_shape, _board, _board_new):-
+  (is_valid_plcmnt(0, 0, _board) -> place_piece(0, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(0, 1, _board) -> place_piece(0, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(0, 2, _board) -> place_piece(0, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 0, _board) -> place_piece(1, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 1, _board) -> place_piece(1, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 2, _board) -> place_piece(1, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 0, _board) -> place_piece(2, 0, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 1, _board) -> place_piece(2, 1, _shape, _board, _board_new));
+  (is_valid_plcmnt(2, 2, _board) -> place_piece(2, 2, _shape, _board, _board_new));
+  (is_valid_plcmnt(1, 2, _board) -> place_piece(1, 2, _shape, _board, _board_new)).
+
+
 check_left_diagonal(_shape, _board):-
   get_board_pos(0, 2, _board, R1),
   get_board_pos(1, 1, _board, R2),
@@ -224,8 +237,11 @@ first_phase(P1, P2, _board, _rodada, R) :-
   place_piece(_row_2, _col_2, _shape_2, _board_new, _board_new_2),
   snapshot_board(_board_new_2),
   first_phase(P1, P2, _board_new_2, _rodada_new, R));
-  (writeln('\nMovement of the computer.(Needs implementation)'),
-  first_phase(P1, P2, _board_new, _rodada_new, R))))).
+  (writeln('---Movement of computer---'),
+  player_shape(P2, _shape_2),
+  computer_move(_shape_2, _board_new, _board_new_2),
+  snapshot_board(_board_new_2),
+  first_phase(P1, P2, _board_new_2, _rodada_new, R))))).
 
 receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :- 
   nth0(0, _player, _name_player),
