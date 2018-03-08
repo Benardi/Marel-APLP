@@ -243,6 +243,34 @@ receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :-
   (is_valid_mvmnt(_shape_player, _row_temp_ori, _col_temp_ori, _row_temp_from, _col_temp_from, _board) -> (_row_ori = _row_temp_ori, _col_ori = _col_temp_ori, _row_from = _row_temp_from, _col_from = _col_temp_from);
   (writeln('\nPlease choose a valid movement!'), receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from))).
 
+get_shapes_of_player(_board, _shape, Shapes) :-
+  append([],[], LST),
+  get_board_pos(0, 0, _board, R),
+  ((_shape == R) -> create_list([0,0], LST, LST1); LST1 = LST),
+  get_board_pos(0, 1, _board, R2),
+  ((_shape == R2) -> create_list([0,1], LST1, LST2); LST2 = LST1),
+  get_board_pos(0, 2, _board, R3),
+  ((_shape == R3) -> create_list([0,2], LST2, LST3); LST3 = LST2),
+  get_board_pos(1, 0, _board, R4),
+  ((_shape == R4) -> create_list([1,0], LST3, LST4); LST4 = LST3),
+  get_board_pos(1, 1, _board, R5),
+  ((_shape == R5) -> create_list([1,1], LST4, LST5); LST5 = LST4),
+  get_board_pos(1, 2, _board, R6),
+  ((_shape == R6) -> create_list([1,2], LST5, LST6); LST6 = LST5),
+  get_board_pos(2, 0, _board, R7),
+  ((_shape == R7) -> create_list([2,0], LST6, LST7); LST7 = LST6),
+  get_board_pos(2, 1, _board, R8),
+  ((_shape == R8) -> create_list([2,1], LST7, LST8); LST8 = LST7),
+  get_board_pos(2, 1, _board, R9),
+  ((_shape == R9) -> create_list([2,2], LST8, LST9); LST9 = LST8),
+  Shapes = LST9.
+
+get_movement(_board, _positon, _row_ori, _col_ori, _row_from, _col_from) :-
+  nth0(0, _positon, _row_ori),
+  nth0(1, _positon, _col_ori),
+  ROW is (0-1), COL is (0-1),
+  _row_from = ROW, _col_from = ROW.
+
 second_phase(P1, P2, _board) :-
   receive_movement(_board, P1, _row_ori_1, _col_ori_1, _row_from_1, _col_from_1),
   move_piece(_row_ori_1, _col_ori_1, _row_from_1, _col_from_1, _board, _board_new),
@@ -309,6 +337,11 @@ main :-
   ((check_for_victory(_shape_1, _board_new), victory_message(P1, _message), writeln(_message));
   (check_for_victory(_shape_2, _board_new), victory_message(P2, _message), writeln(_message));
   (writeln('\n-- The second phase ---'),
+  get_shapes_of_player(_board_new, 'X', OU),
+  writeln(OU),
+  get_movement(_board_new, [0,0], _row_ori, _col_ori, _row_from, _col_from),
+  writeln(_row_from),
+  writeln(_col_from),
   snapshot_board(_board_new),
   second_phase(P1, P2, _board_new))),
   halt(0).
