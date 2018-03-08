@@ -237,8 +237,11 @@ first_phase(P1, P2, _board, _rodada, R) :-
   place_piece(_row_2, _col_2, _shape_2, _board_new, _board_new_2),
   snapshot_board(_board_new_2),
   first_phase(P1, P2, _board_new_2, _rodada_new, R));
-  (writeln('\nMovement of the computer.(Needs implementation)'),
-  first_phase(P1, P2, _board_new, _rodada_new, R))))).
+  (writeln('---Movement of computer---'),
+  player_shape(P2, _shape_2),
+  computer_move(_shape_2, _board_new, _board_new_2),
+  snapshot_board(_board_new_2),
+  first_phase(P1, P2, _board_new_2, _rodada_new, R))))).
 
 receive_movement(_board, _player, _row_ori, _col_ori, _row_from, _col_from) :- 
   nth0(0, _player, _name_player),
@@ -395,9 +398,7 @@ main :-
   (halt(0))),
   writeln('\n-- The first phase ---'),
   snapshot_board(_board),
-  %% teste
-  %% computer_move('V', _board, _board_1),
-  first_phase(P1, P2, _board_1, 3, _board_new),
+  first_phase(P1, P2, _board, 3, _board_new),
   player_shape(P1, _shape_1),
   player_shape(P2, _shape_2),
   ((check_for_victory(_shape_1, _board_new), victory_message(P1, _message), writeln(_message));
