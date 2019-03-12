@@ -27,7 +27,7 @@ To run the application simply execute the targeted script with a proper compiler
 * **Antonio Pedro de Abreu Neto** - *Initial work* - [apedroneto](https://github.com/apedroneto)
 
 
-See also the list of [contributors](https://github.com/Benardi/numerical_methods/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/Benardi/Marel-APLP/contributors) who participated in this project.
 
 ## License
 
